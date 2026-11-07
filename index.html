@@ -3,40 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SMART PARKING UPI – Parking Simulator</title>
+<title>SMART PARKING UPI – Simulasi Sistem Monitoring</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Roboto,system-ui,sans-serif}
-  body{background:#050e17;min-height:100vh;overflow-x:hidden;color:#fff}
+  body{background:radial-gradient(circle at 20% 5%,#0f2a3f,#050e17 85%);min-height:100vh;color:#fff;overflow-x:hidden}
 
-  /* ===== TOP HUD (seperti game) ===== */
-  .hud{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:10px 18px;background:linear-gradient(180deg,rgba(5,20,32,.95),rgba(5,20,32,.75));backdrop-filter:blur(10px);border-bottom:1px solid #1a3a52;gap:14px;flex-wrap:wrap}
-  .hud-left{display:flex;align-items:center;gap:14px}
-  .logo{font-size:1.1rem;font-weight:800;letter-spacing:1.5px;display:flex;align-items:center;gap:8px}
-  .logo span{background:linear-gradient(135deg,#2d9cdb,#1f6e9e);font-size:.6rem;padding:4px 10px;border-radius:20px;letter-spacing:1px;animation:pulse 2s infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+  /* ===== LAYOUT UTAMA ===== */
+  .app{max-width:1600px;margin:0 auto;padding:14px 18px 100px}
 
-  .hud-stats{display:flex;gap:10px;flex-wrap:wrap}
-  .hud-chip{background:#0c2233;border:1px solid #1c3d56;border-radius:12px;padding:6px 14px;display:flex;flex-direction:column;min-width:80px}
-  .hud-chip .lbl{font-size:.55rem;text-transform:uppercase;letter-spacing:1px;color:#6c8da8;font-weight:700}
-  .hud-chip .val{font-size:1.15rem;font-weight:800;line-height:1.1}
+  /* ===== HUD ATAS ===== */
+  .hud{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:linear-gradient(180deg,rgba(5,20,32,.97),rgba(5,20,32,.82));backdrop-filter:blur(10px);border-bottom:1px solid #1a3a52;gap:14px;flex-wrap:wrap;border-radius:0 0 18px 18px;margin:-14px -18px 14px}
+  .logo{font-size:1.05rem;font-weight:800;letter-spacing:1.5px;display:flex;align-items:center;gap:8px}
+  .logo span{background:linear-gradient(135deg,#2d9cdb,#1f6e9e);font-size:.55rem;padding:4px 10px;border-radius:20px;letter-spacing:1px;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+
+  .hud-stats{display:flex;gap:8px;flex-wrap:wrap}
+  .hud-chip{background:#0c2233;border:1px solid #1c3d56;border-radius:12px;padding:5px 12px;display:flex;flex-direction:column;min-width:70px}
+  .hud-chip .lbl{font-size:.52rem;text-transform:uppercase;letter-spacing:1px;color:#6c8da8;font-weight:700}
+  .hud-chip .val{font-size:1.05rem;font-weight:800;line-height:1.1}
   .hud-chip .val.green{color:#2ecc71}
   .hud-chip .val.blue{color:#2d9cdb}
   .hud-chip .val.orange{color:#f1c40f}
+  .hud-chip .val.red{color:#e74c3c}
 
-  /* ===== SCENE (GEDUNG PARKIR) ===== */
-  .scene-wrap{position:relative;width:100%;max-width:1500px;margin:0 auto;padding:30px 20px 20px;min-height:calc(100vh - 90px);display:flex;justify-content:center}
-
-  .building{position:relative;width:100%;max-width:1200px;background:linear-gradient(180deg,#0a1826,#061019);border-radius:14px 14px 4px 4px;border:2px solid #1c3d56;box-shadow:0 30px 80px -20px #000,inset 0 0 100px #00000080;padding:14px 14px 26px;margin-top:10px}
-  .building::before{content:'UPI SMART PARKING';position:absolute;top:-32px;left:50%;transform:translateX(-50%);font-size:.75rem;letter-spacing:6px;color:#2d9cdb;font-weight:800;text-shadow:0 0 20px #2d9cdb88;white-space:nowrap}
+  /* ===== SCENE ===== */
+  .scene-wrap{position:relative;width:100%;display:flex;justify-content:center;margin-bottom:16px}
+  .building{position:relative;width:100%;max-width:1200px;background:linear-gradient(180deg,#0a1826,#061019);border-radius:14px 14px 4px 4px;border:2px solid #1c3d56;box-shadow:0 30px 80px -20px #000,inset 0 0 100px #00000080;padding:14px 14px 26px;margin-top:12px}
+  .building::before{content:'UPI SMART PARKING';position:absolute;top:-26px;left:50%;transform:translateX(-50%);font-size:.7rem;letter-spacing:5px;color:#2d9cdb;font-weight:800;text-shadow:0 0 20px #2d9cdb88;white-space:nowrap}
   .building::after{content:'';position:absolute;bottom:-6px;left:-6px;right:-6px;height:8px;background:linear-gradient(90deg,#0f2a3f,#1f6e9e,#0f2a3f);border-radius:0 0 10px 10px;box-shadow:0 6px 20px #1f6e9e66}
 
-  /* ===== FLOOR ROW ===== */
   .floor-row{position:relative;display:flex;align-items:stretch;margin-bottom:8px;border-radius:8px;background:#0d1f2e;border:1px solid #1a3a52;overflow:hidden;transition:box-shadow .3s}
   .floor-row.led-hijau{box-shadow:inset 4px 0 0 #2ecc71,0 0 24px #2ecc7133}
   .floor-row.led-kuning{box-shadow:inset 4px 0 0 #f1c40f,0 0 24px #f1c40f33}
   .floor-row.led-merah{box-shadow:inset 4px 0 0 #e74c3c,0 0 24px #e74c3c33}
+  .floor-row.recommended{outline:2px dashed #2d9cdb;outline-offset:-2px;animation:recPulse 1s infinite}
+  @keyframes recPulse{0%,100%{outline-color:#2d9cdb}50%{outline-color:#a0e0ff}}
 
-  /* label lantai di kiri */
   .floor-label{flex:0 0 78px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;background:linear-gradient(90deg,#08141f,#0d1f2e);border-right:1px solid #1a3a52;gap:3px;z-index:3}
   .floor-label .num{font-size:.95rem;font-weight:800;letter-spacing:.5px}
   .floor-label .led{width:9px;height:9px;border-radius:50%;background:#2ecc71;box-shadow:0 0 10px currentColor}
@@ -44,127 +47,370 @@
   .floor-row.led-kuning .led{background:#f1c40f;color:#f1c40f}
   .floor-row.led-merah .led{background:#e74c3c;color:#e74c3c}
   .floor-label .pct{font-size:.6rem;color:#6c8da8;font-weight:700}
+  .floor-label .rec{font-size:.5rem;color:#2d9cdb;font-weight:800;letter-spacing:.5px;height:8px}
 
-  /* area slot + jalan */
   .floor-area{flex:1;position:relative;min-height:76px;background:repeating-linear-gradient(90deg,transparent 0 58px,#0f2536 58px 60px)}
   .lane{position:absolute;bottom:0;left:0;right:0;height:18px;background:linear-gradient(180deg,#0a1a24,#071320);border-top:1px dashed #2d9cdb44}
   .lane::after{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:repeating-linear-gradient(90deg,#f1c40f 0 10px,transparent 10px 22px);opacity:.4;transform:translateY(-50%)}
 
   .slots{position:absolute;top:4px;left:4px;right:4px;bottom:18px;display:grid;grid-template-columns:repeat(20,1fr);gap:3px}
   .slot{position:relative;border-radius:4px;transition:background .2s}
-  .slot.kosong{background:#0f2938;border:1px dashed #255070}
-  .slot.terisi{background:linear-gradient(145deg,#2d9cdb,#1a6b9e);border:1px solid #7ac4f0;box-shadow:0 0 8px #2d9cdb66}
+  .slot.kosong{background:#0f2938;border:1px dashed #255070;cursor:pointer}
+  .slot.kosong:hover{border-color:#2d9cdb;background:#12364a}
+  .slot.terisi{background:linear-gradient(145deg,#2d9cdb,#1a6b9e);border:1px solid #7ac4f0;box-shadow:0 0 8px #2d9cdb66;cursor:pointer}
   .slot .veh{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.85rem;animation:pop .3s ease}
   @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
 
-  /* === KENDARAAN BERGERAK === */
   .vehicle{position:absolute;font-size:1.15rem;z-index:20;pointer-events:none;transition:all linear;filter:drop-shadow(0 2px 6px #00000099)}
   .vehicle.car{font-size:1.25rem}
   .vehicle.motor{font-size:1rem}
 
-  /* === RAMP antar lantai === */
   .ramp{position:absolute;right:80px;width:24px;height:8px;background:linear-gradient(180deg,#1f6e9e,#0a1a24);z-index:2;border-radius:2px}
   .ramp::after{content:'▸';position:absolute;right:-6px;top:-5px;color:#2d9cdb;font-size:.7rem}
 
-  /* gerbang bawah */
   .gate-bottom{position:absolute;bottom:-2px;left:18px;font-size:1rem;z-index:5;opacity:.8}
   .gate-label{position:absolute;bottom:22px;left:12px;font-size:.55rem;color:#2d9cdb;letter-spacing:1.5px;font-weight:800;z-index:5;background:#0a1a24;padding:2px 6px;border-radius:3px;border:1px solid #1a3a52}
 
-  /* ===== BOTTOM CONTROL BAR (seperti game) ===== */
-  .controls{position:sticky;bottom:0;z-index:100;display:flex;justify-content:center;align-items:center;gap:12px;padding:12px 18px;background:linear-gradient(0deg,rgba(5,20,32,.98),rgba(5,20,32,.8));backdrop-filter:blur(10px);border-top:1px solid #1a3a52;flex-wrap:wrap;margin-top:10px}
-  .ctrl-btn{background:#0e2a3f;border:1px solid #23506e;color:#e0f0ff;border-radius:50px;padding:11px 20px;font-weight:700;font-size:.85rem;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:8px;box-shadow:0 6px 16px -6px #000}
-  .ctrl-btn:hover{background:#143b56;border-color:#2d9cdb;transform:translateY(-2px)}
-  .ctrl-btn:active{transform:scale(.95)}
-  .ctrl-btn.primary{background:linear-gradient(135deg,#2d9cdb,#1f6e9e);border-color:#6ab8f0;box-shadow:0 8px 22px -6px #2d9cdb99}
-  .ctrl-btn.primary:hover{background:linear-gradient(135deg,#3fb0ef,#2d9cdb)}
-  .ctrl-btn.danger{background:linear-gradient(135deg,#c0392b,#8e2a1f);border-color:#e74c3c;color:#ffd5cf}
+  /* ===== PANEL GRID ===== */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+  .panel{background:linear-gradient(160deg,rgba(14,36,54,.92),rgba(5,16,26,.92));border-radius:18px;padding:14px 16px;border:1px solid #1c3d56;box-shadow:0 14px 30px -14px #000}
+  .panel h3{font-size:.85rem;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:8px;color:#dbeaf6;text-transform:uppercase}
+  .panel h3 .badge{font-size:.55rem;padding:2px 8px;border-radius:20px;background:#0c2a3b;color:#6ab8f0;letter-spacing:.5px}
 
-  .ctrl-select{background:#0a1f2e;border:1px solid #23506e;color:#fff;padding:11px 16px;border-radius:50px;font-size:.85rem;font-weight:700;cursor:pointer;outline:none}
-  .ctrl-select:focus{border-color:#2d9cdb}
+  /* ===== CHART ===== */
+  .chart-box{position:relative;height:170px}
+  .chart-box.small{height:150px}
 
-  .auto-pill{display:flex;align-items:center;gap:8px;background:#0a1f2e;border:1px solid #23506e;border-radius:50px;padding:6px 8px 6px 16px;font-size:.8rem;font-weight:700;color:#8ab0cf}
-  .switch{position:relative;width:44px;height:24px;background:#0a1f2e;border-radius:40px;border:1px solid #23506e;cursor:pointer;transition:.25s;flex-shrink:0}
-  .switch.active{background:#1f6e46;border-color:#2ecc71}
-  .switch::after{content:'';position:absolute;width:18px;height:18px;background:#7fa4c4;border-radius:50%;top:2px;left:2px;transition:.25s}
-  .switch.active::after{left:22px;background:#d4ffe6}
+  /* ===== FORM ===== */
+  .form-row{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+  .form-row label{font-size:.7rem;color:#8ab0cf;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+  .form-row select,.form-row input[type=number],.form-row input[type=range]{background:#0a1f2e;border:1px solid #23506e;color:#fff;padding:8px 12px;border-radius:8px;font-size:.85rem;font-weight:600;outline:none;width:100%}
+  .form-row select:focus,.form-row input:focus{border-color:#2d9cdb}
+  .form-row input[type=range]{padding:0;height:6px;-webkit-appearance:none;appearance:none;background:#0a1f2e;border-radius:4px;border:none;cursor:pointer}
+  .form-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#2d9cdb;cursor:pointer;border:2px solid #fff;box-shadow:0 0 8px #2d9cdb}
+  .form-row input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#2d9cdb;cursor:pointer;border:2px solid #fff}
+  .range-value{font-size:.72rem;color:#2d9cdb;font-weight:700;text-align:right;margin-top:2px}
 
-  .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(80px);background:#0e2536;border:1px solid #2d9cdb;color:#dbeaf6;padding:11px 22px;border-radius:40px;font-size:.85rem;font-weight:700;box-shadow:0 12px 30px -6px #000,0 0 20px #2d9cdb44;opacity:0;transition:.35s;z-index:9999;pointer-events:none;max-width:90vw;text-align:center}
+  /* ===== BUTTONS ===== */
+  .btn-row{display:flex;gap:6px;flex-wrap:wrap}
+  .btn{background:#0e2a3f;border:1px solid #23506e;color:#e0f0ff;border-radius:50px;padding:9px 16px;font-weight:700;font-size:.78rem;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:6px;flex:1;justify-content:center;min-width:60px}
+  .btn:hover{background:#143b56;border-color:#2d9cdb;transform:translateY(-1px)}
+  .btn:active{transform:scale(.96)}
+  .btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+  .btn.primary{background:linear-gradient(135deg,#2d9cdb,#1f6e9e);border-color:#6ab8f0}
+  .btn.primary:hover{background:linear-gradient(135deg,#3fb0ef,#2d9cdb)}
+  .btn.success{background:linear-gradient(135deg,#1f8b4c,#14663a);border-color:#2ecc71}
+  .btn.warning{background:linear-gradient(135deg,#b5871e,#8a6614);border-color:#f1c40f}
+  .btn.danger{background:linear-gradient(135deg,#c0392b,#8e2a1f);border-color:#e74c3c;color:#ffd5cf}
+
+  /* ===== ACTIVITY LOG ===== */
+  .log-list{max-height:230px;overflow-y:auto;font-family:'Consolas','Courier New',monospace;font-size:.72rem;line-height:1.5}
+  .log-list::-webkit-scrollbar{width:6px}
+  .log-list::-webkit-scrollbar-thumb{background:#1c3d56;border-radius:4px}
+  .log-item{padding:4px 8px;border-left:3px solid #2d9cdb;margin-bottom:3px;background:#08141f;border-radius:3px;display:flex;gap:8px}
+  .log-item.in{border-left-color:#2ecc71}
+  .log-item.out{border-left-color:#f1c40f}
+  .log-item.reject{border-left-color:#e74c3c;background:#1a0d0d}
+  .log-time{color:#6c8da8;flex-shrink:0}
+  .log-msg{color:#c4d9ec;flex:1}
+
+  /* ===== STATS SUMMARY ===== */
+  .stat-list{display:flex;flex-direction:column;gap:6px}
+  .stat-item{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#08141f;border-radius:6px;font-size:.8rem}
+  .stat-item .k{color:#8ab0cf;font-weight:600}
+  .stat-item .v{color:#fff;font-weight:800}
+  .stat-item .v.green{color:#2ecc71}
+  .stat-item .v.red{color:#e74c3c}
+  .stat-item .v.orange{color:#f1c40f}
+  .stat-item .v.blue{color:#2d9cdb}
+
+  /* ===== MODAL PENJELASAN ===== */
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:2000;display:none;justify-content:center;align-items:center;padding:20px}
+  .modal-bg.show{display:flex}
+  .modal{background:linear-gradient(160deg,#0e2536,#08141f);border:1px solid #1c3d56;border-radius:20px;max-width:820px;width:100%;max-height:85vh;overflow-y:auto;padding:24px}
+  .modal h2{font-size:1.2rem;margin-bottom:16px;color:#2d9cdb;letter-spacing:1px}
+  .modal h4{font-size:.85rem;color:#6ab8f0;margin:14px 0 6px;letter-spacing:.5px;text-transform:uppercase}
+  .modal p,.modal li{font-size:.82rem;color:#c4d9ec;line-height:1.6;margin-bottom:4px}
+  .modal ul{padding-left:20px;margin-bottom:8px}
+  .modal code{background:#08141f;padding:2px 6px;border-radius:4px;color:#6ab8f0;font-size:.78rem}
+  .modal .close-btn{position:sticky;top:0;float:right;background:#c0392b;border:none;color:#fff;border-radius:50%;width:32px;height:32px;font-size:1rem;cursor:pointer;font-weight:800}
+  .modal table{width:100%;border-collapse:collapse;margin:8px 0;font-size:.78rem}
+  .modal table th,.modal table td{border:1px solid #1c3d56;padding:6px 8px;text-align:left;color:#c4d9ec}
+  .modal table th{background:#08141f;color:#6ab8f0;font-weight:700}
+
+  /* ===== TOAST ===== */
+  .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:#0e2536;border:1px solid #2d9cdb;color:#dbeaf6;padding:11px 22px;border-radius:40px;font-size:.85rem;font-weight:700;box-shadow:0 12px 30px -6px #000,0 0 20px #2d9cdb44;opacity:0;transition:.35s;z-index:9999;pointer-events:none;max-width:90vw;text-align:center}
   .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-  .toast.error{border-color:#e74c3c}
-  .toast.success{border-color:#2ecc71}
+  .toast.error{border-color:#e74c3c;box-shadow:0 12px 30px -6px #000,0 0 20px #e74c3c44}
+  .toast.success{border-color:#2ecc71;box-shadow:0 12px 30px -6px #000,0 0 20px #2ecc7144}
 
-  @media(max-width:900px){
+  @media(max-width:1000px){
+    .grid-3{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:760px){
+    .grid-2,.grid-3{grid-template-columns:1fr}
     .floor-label{flex:0 0 56px}
     .floor-label .num{font-size:.75rem}
     .slot .veh{font-size:.65rem}
     .vehicle{font-size:.95rem}
-    .hud-chip{min-width:60px;padding:5px 10px}
-    .hud-chip .val{font-size:.95rem}
+    .hud-chip{min-width:60px;padding:4px 8px}
+    .hud-chip .val{font-size:.9rem}
     .ramp{right:50px}
   }
 </style>
 </head>
 <body>
 
-<!-- HUD ATAS seperti game -->
-<div class="hud">
-  <div class="hud-left">
-    <div class="logo">🚗 SMART PARKING UPI <span>SIMULATOR</span></div>
+<div class="app">
+
+  <!-- ===== HUD ===== -->
+  <div class="hud">
+    <div class="logo">🚗 SMART PARKING UPI <span>v2.0 · SIMULASI</span></div>
+    <div class="hud-stats">
+      <div class="hud-chip"><span class="lbl">Total</span><span class="val blue" id="hudTotal">60</span></div>
+      <div class="hud-chip"><span class="lbl">Terisi</span><span class="val orange" id="hudOccupied">0</span></div>
+      <div class="hud-chip"><span class="lbl">Kosong</span><span class="val green" id="hudAvailable">60</span></div>
+      <div class="hud-chip"><span class="lbl">Isi</span><span class="val blue" id="hudPercent">0%</span></div>
+      <div class="hud-chip"><span class="lbl">Waktu</span><span class="val blue" id="hudTime">00:00</span></div>
+    </div>
   </div>
-  <div class="hud-stats">
-    <div class="hud-chip"><span class="lbl">Total</span><span class="val blue" id="hudTotal">60</span></div>
-    <div class="hud-chip"><span class="lbl">Terisi</span><span class="val orange" id="hudOccupied">0</span></div>
-    <div class="hud-chip"><span class="lbl">Kosong</span><span class="val green" id="hudAvailable">60</span></div>
-    <div class="hud-chip"><span class="lbl">Isi</span><span class="val blue" id="hudPercent">0%</span></div>
+
+  <!-- ===== SCENE GEDUNG ===== -->
+  <div class="scene-wrap">
+    <div class="building" id="building">
+      <div class="gate-bottom">🚧</div>
+      <div class="gate-label">GERBANG</div>
+    </div>
   </div>
+
+  <!-- ===== BARIS 1: PENGATURAN + SKENARIO + GRAFIK BATANG ===== -->
+  <div class="grid-3">
+
+    <!-- PENGATURAN SIMULASI -->
+    <div class="panel">
+      <h3>⚙️ Pengaturan Simulasi <span class="badge" id="simStatusBadge">IDLE</span></h3>
+
+      <div class="form-row">
+        <label>Skenario</label>
+        <select id="scenarioSelect">
+          <option value="normal">Normal — seimbang masuk/keluar</option>
+          <option value="ramai">Ramai — lebih banyak masuk</option>
+          <option value="sangat_ramai">Sangat Ramai — hampir selalu masuk</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label>Kecepatan Simulasi</label>
+        <input type="range" id="speedRange" min="0.5" max="3" step="0.5" value="1">
+        <div class="range-value" id="speedValue">1.0× (normal)</div>
+      </div>
+
+      <div class="form-row">
+        <label>Jumlah Kendaraan yang Akan Disimulasikan</label>
+        <input type="number" id="targetCount" min="1" max="500" value="40">
+        <div class="range-value" id="progressValue">0 / 40 kendaraan diproses</div>
+      </div>
+
+      <div class="btn-row" style="margin-top:10px">
+        <button class="btn primary" id="startBtn">▶ Mulai</button>
+        <button class="btn warning" id="pauseBtn" disabled>⏸ Jeda</button>
+        <button class="btn success" id="resumeBtn" disabled>⏵ Lanjut</button>
+        <button class="btn danger" id="resetBtn">⟲ Reset</button>
+      </div>
+      <div class="btn-row" style="margin-top:6px">
+        <button class="btn" id="stepEnterBtn">⬆ Masuk 1</button>
+        <button class="btn" id="stepExitBtn">⬇ Keluar 1</button>
+        <button class="btn" id="autoToggleBtn">🤖 Auto</button>
+        <button class="btn" id="infoBtn">📖 Model</button>
+      </div>
+    </div>
+
+    <!-- SKENARIO INFO -->
+    <div class="panel">
+      <h3>🎯 Parameter Skenario</h3>
+      <div class="stat-list">
+        <div class="stat-item"><span class="k">Probabilitas Masuk</span><span class="v blue" id="scenEnterProb">0.60</span></div>
+        <div class="stat-item"><span class="k">Probabilitas Keluar</span><span class="v blue" id="scenExitProb">0.40</span></div>
+        <div class="stat-item"><span class="k">Interval Tick (ms)</span><span class="v blue" id="scenInterval">2000</span></div>
+        <div class="stat-item"><span class="k">Tipe Kendaraan</span><span class="v orange">70% Mobil · 30% Motor</span></div>
+        <div class="stat-item"><span class="k">Rekomendasi Lantai</span><span class="v green">Slot kosong terbanyak</span></div>
+        <div class="stat-item"><span class="k">Kapasitas / Lantai</span><span class="v">20 slot</span></div>
+      </div>
+      <div style="font-size:.72rem;color:#6c8da8;margin-top:10px;line-height:1.5">
+        Sistem otomatis memilih lantai dengan slot kosong terbanyak. Jika kapasitas sama, dipilih lantai dengan nomor terkecil (Lantai 1 → 2 → 3). Jika semua penuh, kendaraan ditolak.
+      </div>
+    </div>
+
+    <!-- GRAFIK JUMLAH KENDARAAN PER LANTAI -->
+    <div class="panel">
+      <h3>📊 Kendaraan per Lantai <span class="badge">REAL-TIME</span></h3>
+      <div class="chart-box"><canvas id="barChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ===== BARIS 2: GRAFIK WAKTU + RIWAYAT ===== -->
+  <div class="grid-2">
+
+    <!-- GRAFIK WAKTU -->
+    <div class="panel">
+      <h3>📈 Kendaraan Terhadap Waktu <span class="badge">TIME SERIES</span></h3>
+      <div class="chart-box small"><canvas id="lineChart"></canvas></div>
+    </div>
+
+    <!-- RIWAYAT AKTIVITAS -->
+    <div class="panel">
+      <h3>📝 Riwayat Aktivitas <span class="badge" id="logCount">0 entri</span></h3>
+      <div class="log-list" id="logList">
+        <div style="color:#6c8da8;font-size:.75rem;padding:8px;text-align:center">Belum ada aktivitas. Klik "Mulai" atau "Masuk 1".</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BARIS 3: ANALISIS HASIL ===== -->
+  <div class="grid-2">
+    <div class="panel">
+      <h3>📊 Analisis Hasil Simulasi</h3>
+      <div class="stat-list">
+        <div class="stat-item"><span class="k">Total Kendaraan Masuk</span><span class="v green" id="anTotalIn">0</span></div>
+        <div class="stat-item"><span class="k">Total Kendaraan Keluar</span><span class="v orange" id="anTotalOut">0</span></div>
+        <div class="stat-item"><span class="k">Kendaraan Ditolak (Penuh)</span><span class="v red" id="anRejected">0</span></div>
+        <div class="stat-item"><span class="k">Total Diproses</span><span class="v blue" id="anProcessed">0</span></div>
+        <div class="stat-item"><span class="k">Lantai Paling Padat</span><span class="v red" id="anBusiest">—</span></div>
+        <div class="stat-item"><span class="k">Keterisian Keseluruhan</span><span class="v blue" id="anOverall">0%</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>📊 Persentase Kapasitas per Lantai</h3>
+      <div class="stat-list">
+        <div class="stat-item"><span class="k">Lantai 1</span><span class="v" id="anF1">0% (0/20)</span></div>
+        <div class="stat-item"><span class="k">Lantai 2</span><span class="v" id="anF2">0% (0/20)</span></div>
+        <div class="stat-item"><span class="k">Lantai 3</span><span class="v" id="anF3">0% (0/20)</span></div>
+        <div style="font-size:.72rem;color:#6c8da8;margin-top:6px;line-height:1.5">
+          Status LED per lantai: <b style="color:#2ecc71">Hijau</b> (0–70%), <b style="color:#f1c40f">Kuning</b> (71–90%), <b style="color:#e74c3c">Merah</b> (91–100%).
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<!-- SCENE gedung -->
-<div class="scene-wrap">
-  <div class="building" id="building">
-    <!-- lantai di-generate JS -->
-    <div class="gate-bottom">🚧</div>
-    <div class="gate-label">GERBANG</div>
-  </div>
-</div>
+<!-- ===== MODAL PENJELASAN MODEL ===== -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <button class="close-btn" id="modalClose">✕</button>
+    <h2>📖 Penjelasan Model Simulasi</h2>
+    <p>Simulasi ini memodelkan sistem parkir bertingkat UPI dengan fokus pada <b>monitoring kapasitas</b> dan <b>rekomendasi lantai otomatis</b>. Model bersifat diskret (event-driven) dengan pembaruan berbasis tick waktu.</p>
 
-<!-- KONTROL BAWAH seperti game -->
-<div class="controls">
-  <select class="ctrl-select" id="floorSelector">
-    <option value="0">Lantai 1</option>
-    <option value="1">Lantai 2</option>
-    <option value="2">Lantai 3</option>
-  </select>
-  <button class="ctrl-btn primary" id="enterBtn">⬆ Kendaraan Masuk</button>
-  <button class="ctrl-btn" id="exitBtn">⬇ Kendaraan Keluar</button>
-  <div class="auto-pill">
-    <span>Auto</span>
-    <div class="switch" id="autoSwitch"></div>
+    <h4>1. Variabel</h4>
+    <ul>
+      <li><code>slots[f][s]</code> — status slot ke-<code>s</code> di lantai <code>f</code>: <code>null</code>, <code>'car'</code>, atau <code>'motor'</code>.</li>
+      <li><code>occupied[f]</code> — jumlah slot terisi lantai <code>f</code> (diturunkan dari <code>slots</code>).</li>
+      <li><code>totalIn</code>, <code>totalOut</code>, <code>totalRejected</code> — akumulator statistik.</li>
+      <li><code>timeSeries</code> — larik pasangan <code>(waktu, totalOccupied)</code> untuk grafik waktu.</li>
+      <li><code>simTime</code> — waktu simulasi dalam detik (bukan waktu nyata).</li>
+      <li><code>running</code>, <code>paused</code> — status mesin simulasi.</li>
+    </ul>
+
+    <h4>2. Parameter</h4>
+    <table>
+      <tr><th>Parameter</th><th>Nilai</th><th>Keterangan</th></tr>
+      <tr><td>Kapasitas per lantai</td><td>20</td><td>Tetap</td></tr>
+      <tr><td>Jumlah lantai</td><td>3</td><td>Tetap</td></tr>
+      <tr><td>Total kapasitas</td><td>60</td><td>20 × 3</td></tr>
+      <tr><td>Prob. masuk (Normal)</td><td>0.60</td><td>Skenario normal</td></tr>
+      <tr><td>Prob. masuk (Ramai)</td><td>0.75</td><td>Skenario ramai</td></tr>
+      <tr><td>Prob. masuk (Sangat Ramai)</td><td>0.90</td><td>Skenario sangat ramai</td></tr>
+      <tr><td>Prob. motor</td><td>0.30</td><td>Sisanya mobil</td></tr>
+      <tr><td>Interval tick dasar</td><td>2000 ms</td><td>Dibagi faktor kecepatan</td></tr>
+    </table>
+
+    <h4>3. Asumsi</h4>
+    <ul>
+      <li>Setiap tick simulasi memproses <b>satu</b> kejadian (masuk atau keluar) secara acak sesuai probabilitas skenario.</li>
+      <li>Kendaraan yang masuk langsung menempati slot kosong pertama di lantai rekomendasi (tidak ada waktu pencarian slot).</li>
+      <li>Kendaraan keluar dipilih dari slot terisi paling kanan (LIFO-like) untuk kesederhanaan.</li>
+      <li>Durasi parkir tidak dimodelkan eksplisit; keluar terjadi secara probabilistik.</li>
+      <li>Kapasitas tidak dapat dilampaui — jika penuh, kendaraan ditolak dan dicatat.</li>
+    </ul>
+
+    <h4>4. Aturan Kerja Sistem</h4>
+    <ul>
+      <li><b>Rekomendasi lantai:</b> pilih lantai dengan <code>slotKosong</code> terbanyak. Jika seri, pilih indeks lantai terkecil.</li>
+      <li><b>Masuk:</b> jika tidak ada slot kosong di semua lantai → tolak &amp; catat. Jika ada → tempatkan di lantai rekomendasi, increment <code>totalIn</code>.</li>
+      <li><b>Keluar:</b> hanya jika ada slot terisi. Pilih slot terisi paling kanan, kosongkan, increment <code>totalOut</code>.</li>
+      <li><b>Konsistensi animasi:</b> state <code>slots</code> hanya diubah <b>sekali</b> setelah animasi selesai (<code>commitEnter</code>/<code>commitExit</code>). Selama animasi, slot target dikunci agar tidak dapat diklik ulang — mencegah double-count.</li>
+      <li><b>Grafik &amp; riwayat:</b> diperbarui setiap kali state berubah (setelah commit), sehingga selalu konsisten dengan kondisi parkiran.</li>
+    </ul>
+
+    <h4>5. Output Simulasi</h4>
+    <ul>
+      <li>Total masuk, total keluar, total ditolak, total diproses.</li>
+      <li>Persentase keterisian per lantai dan keseluruhan.</li>
+      <li>Lantai paling padat.</li>
+      <li>Grafik batang (per lantai) &amp; grafik waktu (time series).</li>
+      <li>Riwayat aktivitas berstempel waktu simulasi.</li>
+    </ul>
+    <p style="margin-top:12px;font-size:.75rem;color:#6c8da8">*Simulasi edukasi untuk mata kuliah Pemodelan &amp; Simulasi Sistem.</p>
   </div>
-  <button class="ctrl-btn danger" id="resetAllBtn">⟲ Reset</button>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 (function(){
+  'use strict';
+
+  // ============================================================
+  // KONSTANTA & STATE
+  // ============================================================
   const CAP = 20, FLOORS = 3;
   let slots = [Array(CAP).fill(null), Array(CAP).fill(null), Array(CAP).fill(null)];
-  let autoInterval = null, autoActive = false;
+  let lockedSlots = new Set(); // "f-s" yang sedang dianimasikan
+  let simTime = 0;             // detik simulasi
+  let totalIn = 0, totalOut = 0, totalRejected = 0, processed = 0;
+  let targetCount = 40;
+  let speed = 1;
+  let scenario = 'normal';
+  let running = false, paused = false;
+  let simInterval = null;
+  let autoMode = false;
+  let timeSeries = []; // {t, v}
 
+  const SCENARIOS = {
+    normal:       { enterProb: 0.60, exitProb: 0.40, label: 'Normal' },
+    ramai:        { enterProb: 0.75, exitProb: 0.25, label: 'Ramai' },
+    sangat_ramai: { enterProb: 0.90, exitProb: 0.10, label: 'Sangat Ramai' }
+  };
+
+  // ============================================================
+  // DOM
+  // ============================================================
   const $ = id => document.getElementById(id);
   const buildingEl = $('building');
-  const hudTotal = $('hudTotal');
-  const hudOccupied = $('hudOccupied');
-  const hudAvailable = $('hudAvailable');
-  const hudPercent = $('hudPercent');
-  const floorSelector = $('floorSelector');
-  const enterBtn = $('enterBtn');
-  const exitBtn = $('exitBtn');
-  const autoSwitch = $('autoSwitch');
-  const resetAllBtn = $('resetAllBtn');
+  const hudTotal = $('hudTotal'), hudOccupied = $('hudOccupied'),
+        hudAvailable = $('hudAvailable'), hudPercent = $('hudPercent'), hudTime = $('hudTime');
+  const scenarioSelect = $('scenarioSelect');
+  const speedRange = $('speedRange'), speedValue = $('speedValue');
+  const targetCountInput = $('targetCount'), progressValue = $('progressValue');
+  const startBtn = $('startBtn'), pauseBtn = $('pauseBtn'),
+        resumeBtn = $('resumeBtn'), resetBtn = $('resetBtn');
+  const stepEnterBtn = $('stepEnterBtn'), stepExitBtn = $('stepExitBtn'),
+        autoToggleBtn = $('autoToggleBtn'), infoBtn = $('infoBtn');
+  const simStatusBadge = $('simStatusBadge');
+  const scenEnterProb = $('scenEnterProb'), scenExitProb = $('scenExitProb'), scenInterval = $('scenInterval');
+  const logList = $('logList'), logCount = $('logCount');
+  const anTotalIn = $('anTotalIn'), anTotalOut = $('anTotalOut'),
+        anRejected = $('anRejected'), anProcessed = $('anProcessed'),
+        anBusiest = $('anBusiest'), anOverall = $('anOverall'),
+        anF1 = $('anF1'), anF2 = $('anF2'), anF3 = $('anF3');
+  const modalBg = $('modalBg'), modalClose = $('modalClose');
   const toastEl = $('toast');
 
+  // ============================================================
+  // UTIL
+  // ============================================================
   let toastTimer;
   function showToast(msg, type='info') {
     toastEl.textContent = msg;
@@ -172,7 +418,7 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 2000);
   }
-  function vibrate(ms=30){ if(navigator.vibrate) navigator.vibrate(ms); }
+  function vibrate(ms=25){ if(navigator.vibrate) navigator.vibrate(ms); }
 
   let audioCtx;
   function beep(freq=660, dur=0.08, type='sine') {
@@ -181,7 +427,7 @@
       if (audioCtx.state==='suspended') audioCtx.resume();
       const o = audioCtx.createOscillator(), g = audioCtx.createGain();
       o.type=type; o.frequency.value=freq;
-      g.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      g.gain.setValueAtTime(0.04, audioCtx.currentTime);
       g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+dur);
       o.connect(g); g.connect(audioCtx.destination);
       o.start(); o.stop(audioCtx.currentTime+dur);
@@ -190,9 +436,94 @@
 
   const countOccupied = fi => slots[fi].filter(v=>v!==null).length;
   const totalOccupied = () => slots.reduce((s,f)=>s+f.filter(v=>v!==null).length,0);
-  const findEmpty = fi => slots[fi].indexOf(null);
+  const freeSlots = fi => CAP - countOccupied(fi);
 
-  // ===== RENDER =====
+  function formatTime(sec) {
+    const m = Math.floor(sec/60), s = sec % 60;
+    return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }
+
+  // ============================================================
+  // REKOMENDASI LANTAI
+  // ============================================================
+  function recommendFloor() {
+    let best = -1, bestFree = -1;
+    for (let f=0; f<FLOORS; f++) {
+      const free = freeSlots(f);
+      if (free > bestFree) { bestFree = free; best = f; }
+    }
+    return bestFree > 0 ? best : -1;
+  }
+
+  // ============================================================
+  // CHART.JS SETUP
+  // ============================================================
+  const chartColors = ['#2d9cdb','#2ecc71','#f1c40f'];
+  const barCtx = document.getElementById('barChart').getContext('2d');
+  const barChart = new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Lantai 1','Lantai 2','Lantai 3'],
+      datasets: [{
+        label: 'Kendaraan',
+        data: [0,0,0],
+        backgroundColor: chartColors.map(c=>c+'cc'),
+        borderColor: chartColors,
+        borderWidth: 2,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} / 20 kendaraan` } }
+      },
+      scales: {
+        y: { beginAtZero: true, max: 20, ticks: { color: '#6c8da8', stepSize: 5 }, grid: { color: '#1c3d56' } },
+        x: { ticks: { color: '#8ab0cf' }, grid: { display: false } }
+      }
+    }
+  });
+
+  const lineCtx = document.getElementById('lineChart').getContext('2d');
+  const lineChart = new Chart(lineCtx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Lantai 1', data: [], borderColor: '#2d9cdb', backgroundColor: 'rgba(45,156,219,0.1)', tension: 0.3, fill: true, pointRadius: 0, borderWidth: 2 },
+        { label: 'Lantai 2', data: [], borderColor: '#2ecc71', backgroundColor: 'rgba(46,204,113,0.1)', tension: 0.3, fill: true, pointRadius: 0, borderWidth: 2 },
+        { label: 'Lantai 3', data: [], borderColor: '#f1c40f', backgroundColor: 'rgba(241,196,15,0.1)', tension: 0.3, fill: true, pointRadius: 0, borderWidth: 2 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 0 },
+      plugins: { legend: { labels: { color: '#8ab0cf', font: { size: 9 }, boxWidth: 10 } } },
+      scales: {
+        y: { beginAtZero: true, max: 20, ticks: { color: '#6c8da8', stepSize: 5, font: { size: 9 } }, grid: { color: '#1c3d56' } },
+        x: { ticks: { color: '#6c8da8', font: { size: 8 }, maxTicksLimit: 8 }, grid: { display: false } }
+      }
+    }
+  });
+
+  // ============================================================
+  // RIWAYAT
+  // ============================================================
+  function addLog(type, msg) {
+    const div = document.createElement('div');
+    div.className = 'log-item ' + type;
+    div.innerHTML = `<span class="log-time">[${formatTime(simTime)}]</span><span class="log-msg">${msg}</span>`;
+    if (logList.firstChild && logList.firstChild.textContent.includes('Belum ada')) logList.innerHTML = '';
+    logList.appendChild(div);
+    logList.scrollTop = logList.scrollHeight;
+    logCount.textContent = logList.children.length + ' entri';
+  }
+
+  // ============================================================
+  // RENDER GEDUNG
+  // ============================================================
   function render() {
     const total = totalOccupied();
     const cap = CAP*FLOORS;
@@ -202,8 +533,10 @@
     hudOccupied.textContent = total;
     hudAvailable.textContent = avail;
     hudPercent.textContent = pct+'%';
+    hudTime.textContent = formatTime(simTime);
 
-    // hapus semua floor-row lama, sisipkan ulang sebelum gate
+    const recFloor = recommendFloor();
+
     buildingEl.querySelectorAll('.floor-row').forEach(e=>e.remove());
 
     let html = '';
@@ -218,16 +551,19 @@
       for (let s=0;s<CAP;s++){
         const v = slots[i][s];
         const filled = v!==null;
+        const lockKey = i+'-'+s;
+        const locked = lockedSlots.has(lockKey);
         const icon = filled ? (v==='motor'?'🏍️':'🚗') : '';
-        slotHtml += `<div class="slot ${filled?'terisi':'kosong'}" data-floor="${i}" data-slot="${s}" data-filled="${filled}">${filled?`<span class="veh">${icon}</span>`:''}</div>`;
+        slotHtml += `<div class="slot ${filled?'terisi':'kosong'}" data-floor="${i}" data-slot="${s}" data-filled="${filled}" data-locked="${locked}" style="${locked?'pointer-events:none;opacity:.7':''}">${filled?`<span class="veh">${icon}</span>`:''}</div>`;
       }
 
       html += `
-        <div class="floor-row ${led}" data-floor="${i}" id="floor-${i}">
+        <div class="floor-row ${led} ${recFloor===i?'recommended':''}" data-floor="${i}" id="floor-${i}">
           <div class="floor-label">
             <div class="led"></div>
             <div class="num">L${i+1}</div>
             <div class="pct">${percent}%</div>
+            <div class="rec">${recFloor===i?'★ REKOMENDASI':''}</div>
           </div>
           <div class="floor-area">
             <div class="slots" id="slots-${i}">${slotHtml}</div>
@@ -236,23 +572,82 @@
           </div>
         </div>`;
     }
-    // sisipkan di paling awal building
     const gate = buildingEl.querySelector('.gate-bottom');
     gate.insertAdjacentHTML('beforebegin', html);
 
-    // attach click slot
     buildingEl.querySelectorAll('.slot').forEach(slot=>{
       slot.addEventListener('click', ()=>handleSlotClick(slot));
     });
+
+    updateCharts();
+    updateAnalysis();
   }
 
-  // ===== ANIMASI KENDARAAN NAIK DARI GERBANG BAWAH KE LANTAI =====
+  // ============================================================
+  // UPDATE CHART
+  // ============================================================
+  function updateCharts() {
+    barChart.data.datasets[0].data = [countOccupied(0), countOccupied(1), countOccupied(2)];
+    barChart.update('none');
+
+    const t = timeSeries.length ? timeSeries[timeSeries.length-1].t : simTime;
+    lineChart.data.labels.push(formatTime(t));
+    lineChart.data.datasets[0].data.push(countOccupied(0));
+    lineChart.data.datasets[1].data.push(countOccupied(1));
+    lineChart.data.datasets[2].data.push(countOccupied(2));
+    if (lineChart.data.labels.length > 40) {
+      lineChart.data.labels.shift();
+      lineChart.data.datasets.forEach(ds=>ds.data.shift());
+    }
+    lineChart.update('none');
+  }
+
+  // ============================================================
+  // UPDATE ANALISIS
+  // ============================================================
+  function updateAnalysis() {
+    anTotalIn.textContent = totalIn;
+    anTotalOut.textContent = totalOut;
+    anRejected.textContent = totalRejected;
+    anProcessed.textContent = processed;
+
+    const occs = [countOccupied(0), countOccupied(1), countOccupied(2)];
+    const maxOcc = Math.max(...occs);
+    let busiest = '—';
+    if (maxOcc > 0) {
+      const idx = occs.indexOf(maxOcc);
+      busiest = `Lantai ${idx+1} (${maxOcc} kendaraan)`;
+    }
+    anBusiest.textContent = busiest;
+    const total = totalOccupied();
+    anOverall.textContent = Math.round(total/(CAP*FLOORS)*100) + '%';
+
+    const fmt = (f) => {
+      const o = countOccupied(f);
+      return Math.round(o/CAP*100) + '% (' + o + '/20)';
+    };
+    anF1.textContent = fmt(0);
+    anF2.textContent = fmt(1);
+    anF3.textContent = fmt(2);
+  }
+
+  // ============================================================
+  // ANIMASI MASUK
+  // ============================================================
   function animateEnter(floorIdx, slotIdx, vt) {
+    const lockKey = floorIdx+'-'+slotIdx;
+    lockedSlots.add(lockKey);
+
     const floorRow = document.getElementById(`floor-${floorIdx}`);
     const slotsEl = document.getElementById(`slots-${floorIdx}`);
     if (!floorRow || !slotsEl) { commitEnter(floorIdx, slotIdx, vt); return; }
     const targetSlot = slotsEl.querySelector(`.slot[data-slot="${slotIdx}"]`);
     if (!targetSlot) { commitEnter(floorIdx, slotIdx, vt); return; }
+
+    // update visual slot jadi locked (tapi masih kosong)
+    targetSlot.dataset.locked = 'true';
+    targetSlot.style.pointerEvents = 'none';
+    targetSlot.style.opacity = '0.7';
 
     const bRect = buildingEl.getBoundingClientRect();
     const fRect = floorRow.getBoundingClientRect();
@@ -262,9 +657,8 @@
     const veh = document.createElement('div');
     veh.className = 'vehicle ' + vt;
     veh.textContent = icon;
-    // posisi awal: gerbang bawah gedung
-    const startX = bRect.left + 30 - bRect.left; // relatif ke gedung
-    const startY = bRect.bottom - 40 - bRect.top;
+    const startX = 30;
+    const startY = bRect.height - 40;
     veh.style.left = startX + 'px';
     veh.style.top = startY + 'px';
     veh.style.opacity = '0';
@@ -272,47 +666,54 @@
 
     const targetX = sRect.left - bRect.left + sRect.width/2 - 8;
     const targetY = sRect.top - bRect.top + sRect.height/2 - 8;
-
-    // jalur: dari gerbang (kiri bawah) -> naik ke ketinggian lantai -> horizontal ke slot
     const laneY = fRect.bottom - bRect.top - 12;
 
-    // step 0: muncul
+    const speedMul = 1 / Math.max(0.5, speed);
+
     requestAnimationFrame(()=>{
       veh.style.opacity='1';
-      veh.style.transition='left 0.6s ease-in-out, top 0.5s ease-in-out';
-      veh.style.left = (bRect.left + 40 - bRect.left) + 'px';
+      veh.style.transition=`left ${0.6*speedMul}s ease-in-out, top ${0.5*speedMul}s ease-in-out`;
+      veh.style.left = (40) + 'px';
       veh.style.top = laneY + 'px';
       beep(500, 0.06, 'triangle');
     });
-
-    // step 1: horizontal ke kolom slot
     setTimeout(()=>{
-      veh.style.transition='left 0.7s ease-in-out';
+      veh.style.transition=`left ${0.7*speedMul}s ease-in-out`;
       veh.style.left = targetX + 'px';
-    }, 620);
-
-    // step 2: masuk ke slot
+    }, 620*speedMul);
     setTimeout(()=>{
-      veh.style.transition='top 0.4s ease-out';
+      veh.style.transition=`top ${0.4*speedMul}s ease-out`;
       veh.style.top = targetY + 'px';
       beep(780, 0.08);
-    }, 1350);
-
-    // step 3: selesai
+    }, 1350*speedMul);
     setTimeout(()=>{
       veh.remove();
       commitEnter(floorIdx, slotIdx, vt);
-    }, 1800);
+    }, 1800*speedMul);
   }
 
   function commitEnter(floorIdx, slotIdx, vt) {
-    if (slots[floorIdx][slotIdx]===null) slots[floorIdx][slotIdx]=vt;
+    lockedSlots.delete(floorIdx+'-'+slotIdx);
+    if (slots[floorIdx][slotIdx]===null) {
+      slots[floorIdx][slotIdx]=vt;
+      totalIn++;
+      processed++;
+      addLog('in', `⬆ ${vt==='motor'?'Motor':'Mobil'} masuk → Lantai ${floorIdx+1} slot ${slotIdx+1}`);
+      timeSeries.push({t: simTime, v: totalOccupied()});
+    }
     render();
-    vibrate(25);
+    vibrate(20);
+    updateProgress();
+    checkFinished();
   }
 
-  // ===== ANIMASI KELUAR =====
+  // ============================================================
+  // ANIMASI KELUAR
+  // ============================================================
   function animateExit(floorIdx, slotIdx, vt) {
+    const lockKey = floorIdx+'-'+slotIdx;
+    lockedSlots.add(lockKey);
+
     const floorRow = document.getElementById(`floor-${floorIdx}`);
     const slotsEl = document.getElementById(`slots-${floorIdx}`);
     if (!floorRow || !slotsEl) { commitExit(floorIdx, slotIdx); return; }
@@ -332,157 +733,298 @@
     veh.style.transition='none';
     buildingEl.appendChild(veh);
 
-    // kosongkan dulu di state biar icon slot hilang
-    commitExit(floorIdx, slotIdx, true);
+    commitExit(floorIdx, slotIdx, true); // update state, render, log
 
     const laneY = fRect.bottom - bRect.top - 12;
-    const exitX = bRect.left + 20 - bRect.left;
+    const speedMul = 1 / Math.max(0.5, speed);
 
-    // step 1: turun ke lane
     requestAnimationFrame(()=>{
-      veh.style.transition='top 0.35s ease-out';
+      veh.style.transition=`top ${0.35*speedMul}s ease-out`;
       veh.style.top = laneY + 'px';
       beep(450,0.08,'triangle');
     });
-
-    // step 2: keluar ke gerbang kiri bawah (turun terus ke bawah gedung)
     setTimeout(()=>{
-      veh.style.transition='left 0.6s ease-in-out, top 0.5s ease-in-out, opacity 0.3s';
-      veh.style.left = exitX + 'px';
+      veh.style.transition=`left ${0.6*speedMul}s ease-in-out, top ${0.5*speedMul}s ease-in-out, opacity 0.3s`;
+      veh.style.left = 20 + 'px';
       veh.style.top = (bRect.height - 30) + 'px';
       veh.style.opacity='0.2';
-    }, 380);
-
-    setTimeout(()=>veh.remove(), 1100);
-    vibrate(25);
+    }, 380*speedMul);
+    setTimeout(()=>{ veh.remove(); lockedSlots.delete(lockKey); }, 1100*speedMul);
+    vibrate(20);
   }
 
   function commitExit(floorIdx, slotIdx, silent=false) {
-    slots[floorIdx][slotIdx] = null;
+    lockedSlots.delete(floorIdx+'-'+slotIdx);
+    const vt = slots[floorIdx][slotIdx];
+    if (vt!==null) {
+      slots[floorIdx][slotIdx] = null;
+      totalOut++;
+      processed++;
+      if (!silent) addLog('out', `⬇ ${vt==='motor'?'Motor':'Mobil'} keluar ← Lantai ${floorIdx+1} slot ${slotIdx+1}`);
+      else addLog('out', `⬇ ${vt==='motor'?'Motor':'Mobil'} keluar ← Lantai ${floorIdx+1} slot ${slotIdx+1}`);
+      timeSeries.push({t: simTime, v: totalOccupied()});
+      if (!silent) beep(480,0.08,'triangle');
+    }
     render();
-    if (!silent) beep(480,0.08,'triangle');
+    if (!silent) vibrate(20);
+    updateProgress();
+    checkFinished();
   }
 
-  // ===== CLICK SLOT =====
+  // ============================================================
+  // OPERASI MASUK / KELUAR (PUBLIK)
+  // ============================================================
+  function tryEnter() {
+    const rec = recommendFloor();
+    if (rec === -1) {
+      totalRejected++;
+      processed++;
+      addLog('reject', `✕ Ditolak — semua lantai penuh`);
+      showToast('❌ Semua lantai penuh! Kendaraan ditolak.', 'error');
+      beep(200,0.15,'sawtooth');
+      updateAnalysis();
+      updateProgress();
+      checkFinished();
+      return false;
+    }
+    // pilih slot kosong pertama di lantai rekomendasi
+    let slotIdx = slots[rec].indexOf(null);
+    if (slotIdx === -1) { // seharusnya tidak terjadi, tapi jaga-jaga
+      totalRejected++;
+      processed++;
+      addLog('reject', `✕ Ditolak — lantai rekomendasi penuh`);
+      updateAnalysis(); updateProgress(); checkFinished();
+      return false;
+    }
+    const vt = Math.random()<0.3?'motor':'car';
+    animateEnter(rec, slotIdx, vt);
+    return true;
+  }
+
+  function tryExit() {
+    // cari lantai dengan kendaraan terbanyak untuk keluar (biar seimbang)
+    let bestF = -1, bestOcc = 0;
+    for (let f=0; f<FLOORS; f++) {
+      const o = countOccupied(f);
+      if (o > bestOcc) { bestOcc = o; bestF = f; }
+    }
+    if (bestF === -1) return false;
+    let slotIdx = -1;
+    for (let s=CAP-1; s>=0; s--) {
+      if (slots[bestF][s]!==null && !lockedSlots.has(bestF+'-'+s)) { slotIdx = s; break; }
+    }
+    if (slotIdx === -1) return false;
+    const vt = slots[bestF][slotIdx];
+    animateExit(bestF, slotIdx, vt);
+    return true;
+  }
+
+  // ============================================================
+  // KLIK SLOT
+  // ============================================================
   function handleSlotClick(slot) {
     const fi = parseInt(slot.dataset.floor,10);
     const si = parseInt(slot.dataset.slot,10);
+    if (lockedSlots.has(fi+'-'+si)) return;
     const filled = slots[fi][si]!==null;
     if (filled) {
       const vt = slots[fi][si];
-      showToast(`⬇️ ${vt==='motor'?'Motor':'Mobil'} keluar Lantai ${fi+1}`,'success');
+      showToast(`⬇ ${vt==='motor'?'Motor':'Mobil'} keluar Lantai ${fi+1}`,'success');
       animateExit(fi, si, vt);
     } else {
+      // klik manual: tetap hormati rekomendasi? Tidak — manual berarti user pilih sendiri.
+      // Tapi kita update totalIn saat commit.
       const vt = Math.random()<0.3?'motor':'car';
-      showToast(`⬆️ ${vt==='motor'?'Motor':'Mobil'} masuk Lantai ${fi+1}`,'success');
+      showToast(`⬆ ${vt==='motor'?'Motor':'Mobil'} masuk Lantai ${fi+1}`,'success');
       animateEnter(fi, si, vt);
     }
   }
 
-  // ===== TOMBOL MASUK =====
-  function addVehicleAuto(fi) {
-    if (fi<0||fi>=FLOORS) return false;
-    const empty = findEmpty(fi);
-    if (empty===-1) return false;
-    const vt = Math.random()<0.3?'motor':'car';
-    showToast(`⬆️ ${vt==='motor'?'Motor':'Mobil'} masuk Lantai ${fi+1}`,'success');
-    animateEnter(fi, empty, vt);
-    return true;
+  // ============================================================
+  // MESIN SIMULASI (AUTO TICK)
+  // ============================================================
+  function tick() {
+    if (!running || paused) return;
+    simTime++;
+    const sc = SCENARIOS[scenario];
+    const doEnter = Math.random() < sc.enterProb;
+    if (doEnter) tryEnter(); else tryExit();
+    hudTime.textContent = formatTime(simTime);
   }
 
-  function removeVehicle(fi) {
-    if (fi<0||fi>=FLOORS) return false;
-    let idx=-1;
-    for (let s=CAP-1;s>=0;s--){ if(slots[fi][s]!==null){idx=s;break;} }
-    if (idx===-1) return false;
-    const vt = slots[fi][idx];
-    showToast(`⬇️ ${vt==='motor'?'Motor':'Mobil'} keluar Lantai ${fi+1}`,'success');
-    animateExit(fi, idx, vt);
-    return true;
+  function startSim() {
+    if (running) return;
+    running = true;
+    paused = false;
+    targetCount = Math.max(1, parseInt(targetCountInput.value)||40);
+    if (processed >= targetCount) {
+      // reset progres kalau sudah mencapai target
+      processed = 0;
+    }
+    simStatusBadge.textContent = 'RUNNING';
+    simStatusBadge.style.color = '#2ecc71';
+    startBtn.disabled = true;
+    pauseBtn.disabled = false;
+    resumeBtn.disabled = true;
+    scheduleInterval();
+    showToast('▶ Simulasi dimulai', 'success');
+  }
+
+  function scheduleInterval() {
+    if (simInterval) clearInterval(simInterval);
+    const base = 2000 / Math.max(0.5, speed);
+    simInterval = setInterval(() => {
+      if (!running || paused) return;
+      if (processed >= targetCount) { stopSim('target'); return; }
+      tick();
+    }, base);
+    scenInterval.textContent = Math.round(base);
+  }
+
+  function pauseSim() {
+    if (!running || paused) return;
+    paused = true;
+    simStatusBadge.textContent = 'PAUSED';
+    simStatusBadge.style.color = '#f1c40f';
+    pauseBtn.disabled = true;
+    resumeBtn.disabled = false;
+    showToast('⏸ Simulasi dijeda', 'info');
+  }
+
+  function resumeSim() {
+    if (!running || !paused) return;
+    paused = false;
+    simStatusBadge.textContent = 'RUNNING';
+    simStatusBadge.style.color = '#2ecc71';
+    pauseBtn.disabled = false;
+    resumeBtn.disabled = true;
+    showToast('⏵ Simulasi dilanjutkan', 'success');
+  }
+
+  function stopSim(reason) {
+    running = false;
+    paused = false;
+    if (simInterval) { clearInterval(simInterval); simInterval = null; }
+    simStatusBadge.textContent = reason==='target' ? 'SELESAI' : 'IDLE';
+    simStatusBadge.style.color = reason==='target' ? '#2d9cdb' : '#6c8da8';
+    startBtn.disabled = false;
+    pauseBtn.disabled = true;
+    resumeBtn.disabled = true;
+    if (reason==='target') {
+      showToast(`✅ Simulasi selesai — ${targetCount} kendaraan diproses`, 'success');
+      addLog('info', `★ Simulasi selesai — ${targetCount} kendaraan diproses`);
+    }
   }
 
   function resetAll() {
-    slots = [Array(CAP).fill(null),Array(CAP).fill(null),Array(CAP).fill(null)];
-    if (autoActive) stopAuto();
+    if (simInterval) { clearInterval(simInterval); simInterval = null; }
+    running = false; paused = false;
+    slots = [Array(CAP).fill(null), Array(CAP).fill(null), Array(CAP).fill(null)];
+    lockedSlots = new Set();
+    simTime = 0; totalIn = 0; totalOut = 0; totalRejected = 0; processed = 0;
+    timeSeries = [];
+    logList.innerHTML = '<div style="color:#6c8da8;font-size:.75rem;padding:8px;text-align:center">Belum ada aktivitas. Klik "Mulai" atau "Masuk 1".</div>';
+    logCount.textContent = '0 entri';
+    lineChart.data.labels = [];
+    lineChart.data.datasets.forEach(ds=>ds.data=[]);
+    lineChart.update('none');
+    simStatusBadge.textContent = 'IDLE';
+    simStatusBadge.style.color = '#6c8da8';
+    startBtn.disabled = false;
+    pauseBtn.disabled = true;
+    resumeBtn.disabled = true;
+    targetCount = Math.max(1, parseInt(targetCountInput.value)||40);
     render();
-    beep(500,0.15,'sine');
-    showToast('⟲ Semua data direset','info');
+    updateProgress();
+    showToast('⟲ Semua data direset', 'info');
   }
 
-  // ===== AUTO =====
-  function startAuto() {
-    if (autoInterval) clearInterval(autoInterval);
-    autoActive = true;
-    autoSwitch.classList.add('active');
-    showToast('▶ Simulasi otomatis aktif','info');
-    autoInterval = setInterval(()=>{
-      const fi = Math.floor(Math.random()*FLOORS);
-      const doEnter = Math.random()<0.6;
-      if (doEnter) {
-        let target=-1;
-        for (let i=0;i<FLOORS;i++){ const idx=(fi+i)%FLOORS; if(findEmpty(idx)!==-1){target=idx;break;} }
-        if (target!==-1) {
-          const empty = findEmpty(target);
-          const vt = Math.random()<0.3?'motor':'car';
-          animateEnter(target, empty, vt);
-        } else {
-          for (let i=0;i<FLOORS;i++){
-            const idx=(fi+i)%FLOORS;
-            let found=-1; for(let s=CAP-1;s>=0;s--){if(slots[idx][s]!==null){found=s;break;}}
-            if (found!==-1){ animateExit(idx,found,slots[idx][found]); break; }
-          }
-        }
-      } else {
-        let done=false;
-        for (let i=0;i<FLOORS;i++){
-          const idx=(fi+i)%FLOORS;
-          let found=-1; for(let s=CAP-1;s>=0;s--){if(slots[idx][s]!==null){found=s;break;}}
-          if (found!==-1){ animateExit(idx,found,slots[idx][found]); done=true; break; }
-        }
-        if (!done) {
-          for (let i=0;i<FLOORS;i++){
-            const idx=(fi+i)%FLOORS;
-            if (findEmpty(idx)!==-1){ animateEnter(idx, findEmpty(idx), Math.random()<0.3?'motor':'car'); break; }
-          }
-        }
-      }
-    }, 2400);
+  // ============================================================
+  // PROGRESS & FINISH CHECK
+  // ============================================================
+  function updateProgress() {
+    progressValue.textContent = `${processed} / ${targetCount} kendaraan diproses`;
   }
-  function stopAuto() {
-    if (autoInterval){clearInterval(autoInterval);autoInterval=null;}
-    autoActive=false;
-    autoSwitch.classList.remove('active');
-    showToast('⏸ Simulasi otomatis berhenti','info');
-  }
-  function toggleAuto(){ autoActive?stopAuto():startAuto(); }
 
-  // ===== INIT =====
+  function checkFinished() {
+    if (processed >= targetCount && running) {
+      stopSim('target');
+    }
+  }
+
+  // ============================================================
+  // EVENT LISTENERS
+  // ============================================================
+  startBtn.addEventListener('click', startSim);
+  pauseBtn.addEventListener('click', pauseSim);
+  resumeBtn.addEventListener('click', resumeSim);
+  resetBtn.addEventListener('click', resetAll);
+
+  stepEnterBtn.addEventListener('click', () => {
+    if (!running) { // step manual diizinkan meski belum mulai
+      targetCount = Math.max(1, parseInt(targetCountInput.value)||40);
+    }
+    tryEnter();
+  });
+  stepExitBtn.addEventListener('click', () => tryExit());
+
+  let autoManual = false;
+  autoToggleBtn.addEventListener('click', () => {
+    autoManual = !autoManual;
+    autoToggleBtn.classList.toggle('primary', autoManual);
+    if (autoManual) {
+      if (!running) startSim();
+      showToast('🤖 Auto manual aktif', 'info');
+    } else {
+      pauseSim();
+      showToast('⏸ Auto manual nonaktif', 'info');
+    }
+  });
+
+  scenarioSelect.addEventListener('change', (e) => {
+    scenario = e.target.value;
+    const sc = SCENARIOS[scenario];
+    scenEnterProb.textContent = sc.enterProb.toFixed(2);
+    scenExitProb.textContent = sc.exitProb.toFixed(2);
+    showToast(`Skenario: ${sc.label}`, 'info');
+  });
+
+  speedRange.addEventListener('input', (e) => {
+    speed = parseFloat(e.target.value);
+    speedValue.textContent = speed.toFixed(1) + '× (' + (speed<1?'lambat':speed<2?'normal':'cepat') + ')';
+    if (running) scheduleInterval();
+  });
+
+  targetCountInput.addEventListener('change', (e) => {
+    targetCount = Math.max(1, Math.min(500, parseInt(e.target.value)||40));
+    e.target.value = targetCount;
+    updateProgress();
+  });
+
+  infoBtn.addEventListener('click', () => modalBg.classList.add('show'));
+  modalClose.addEventListener('click', () => modalBg.classList.remove('show'));
+  modalBg.addEventListener('click', (e) => { if (e.target===modalBg) modalBg.classList.remove('show'); });
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName==='INPUT' || e.target.tagName==='SELECT') return;
+    if (e.key==='Enter'){e.preventDefault();startBtn.click();}
+    if (e.key==='Backspace'){e.preventDefault();stepExitBtn.click();}
+    if (e.key===' '){e.preventDefault(); if(paused) resumeBtn.click(); else if(running) pauseBtn.click();}
+    if (e.key==='r'||e.key==='R') resetBtn.click();
+  });
+
+  window.addEventListener('beforeunload', () => { if (simInterval) clearInterval(simInterval); });
+
+  // ============================================================
+  // INIT
+  // ============================================================
   function init() {
+    const sc = SCENARIOS[scenario];
+    scenEnterProb.textContent = sc.enterProb.toFixed(2);
+    scenExitProb.textContent = sc.exitProb.toFixed(2);
+    targetCount = parseInt(targetCountInput.value)||40;
     render();
-    enterBtn.addEventListener('click', ()=>{
-      const fi = parseInt(floorSelector.value,10);
-      if (!addVehicleAuto(fi)) {
-        showToast(`❌ Lantai ${fi+1} penuh!`,'error');
-        beep(200,0.15,'sawtooth');
-      }
-    });
-    exitBtn.addEventListener('click', ()=>{
-      const fi = parseInt(floorSelector.value,10);
-      if (!removeVehicle(fi)) {
-        showToast(`❌ Lantai ${fi+1} kosong!`,'error');
-        beep(200,0.15,'sawtooth');
-      }
-    });
-    resetAllBtn.addEventListener('click', resetAll);
-    autoSwitch.addEventListener('click', toggleAuto);
-
-    document.addEventListener('keydown', e=>{
-      if (e.target.tagName==='SELECT') return;
-      if (e.key==='Enter'){e.preventDefault();enterBtn.click();}
-      if (e.key==='Backspace'){e.preventDefault();exitBtn.click();}
-      if (e.key==='r'||e.key==='R') resetAllBtn.click();
-    });
-    window.addEventListener('beforeunload', ()=>{ if(autoInterval) clearInterval(autoInterval); });
+    updateProgress();
   }
 
   init();
