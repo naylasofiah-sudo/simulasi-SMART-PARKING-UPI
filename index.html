@@ -10,7 +10,6 @@
   body{background:radial-gradient(circle at 20% 5%,#0f2a3f,#050e17 85%);min-height:100vh;color:#fff;overflow-x:hidden}
   .app{max-width:1600px;margin:0 auto;padding:14px 18px 100px}
 
-  /* ===== HUD ===== */
   .hud{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:linear-gradient(180deg,rgba(5,20,32,.97),rgba(5,20,32,.82));backdrop-filter:blur(10px);border-bottom:1px solid #1a3a52;gap:14px;flex-wrap:wrap;border-radius:0 0 18px 18px;margin:-14px -18px 14px}
   .logo{font-size:1.05rem;font-weight:800;letter-spacing:1.5px;display:flex;align-items:center;gap:8px}
   .logo span{background:linear-gradient(135deg,#2d9cdb,#1f6e9e);font-size:.55rem;padding:4px 10px;border-radius:20px;letter-spacing:1px;animation:pulse 2s infinite}
@@ -25,7 +24,6 @@
   .hud-chip .val.red{color:#e74c3c}
   .hud-chip .val.purple{color:#9b59b6}
 
-  /* ===== SCENE ===== */
   .scene-wrap{position:relative;width:100%;display:flex;justify-content:center;margin-bottom:16px}
   .building{position:relative;width:100%;max-width:1200px;background:linear-gradient(180deg,#0a1826,#061019);border-radius:14px 14px 4px 4px;border:2px solid #1c3d56;box-shadow:0 30px 80px -20px #000,inset 0 0 100px #00000080;padding:14px 14px 26px;margin-top:12px}
   .building::before{content:'UPI SMART PARKING';position:absolute;top:-26px;left:50%;transform:translateX(-50%);font-size:.7rem;letter-spacing:5px;color:#2d9cdb;font-weight:800;text-shadow:0 0 20px #2d9cdb88;white-space:nowrap}
@@ -65,7 +63,6 @@
   .gate-bottom{position:absolute;bottom:-2px;left:18px;font-size:1rem;z-index:5;opacity:.8}
   .gate-label{position:absolute;bottom:22px;left:12px;font-size:.55rem;color:#2d9cdb;letter-spacing:1.5px;font-weight:800;z-index:5;background:#0a1a24;padding:2px 6px;border-radius:3px;border:1px solid #1a3a52}
 
-  /* ===== PANEL ===== */
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
   .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
   .panel{background:linear-gradient(160deg,rgba(14,36,54,.92),rgba(5,16,26,.92));border-radius:18px;padding:14px 16px;border:1px solid #1c3d56;box-shadow:0 14px 30px -14px #000}
@@ -160,9 +157,8 @@
 
 <div class="app">
 
-  <!-- ===== HUD ===== -->
   <div class="hud">
-    <div class="logo">🚗 SMART PARKING UPI <span>v2.1 · TIME-OF-DAY DEMAND</span></div>
+    <div class="logo">🚗 SMART PARKING UPI <span>v2.2 · FIXED</span></div>
     <div class="hud-stats">
       <div class="hud-chip"><span class="lbl">Jam Simulasi</span><span class="val purple" id="hudTime">06:00</span></div>
       <div class="hud-chip"><span class="lbl">Fase</span><span class="val blue" id="hudPhase">—</span></div>
@@ -173,7 +169,6 @@
     </div>
   </div>
 
-  <!-- ===== SCENE ===== -->
   <div class="scene-wrap">
     <div class="building" id="building">
       <div class="gate-bottom">🚧</div>
@@ -181,7 +176,6 @@
     </div>
   </div>
 
-  <!-- ===== BARIS 1: PENGATURAN + PROFIL DEMAND + GRAFIK BATANG ===== -->
   <div class="grid-3">
 
     <div class="panel">
@@ -190,7 +184,7 @@
       <div class="form-row">
         <label>Kecepatan Simulasi</label>
         <input type="range" id="speedRange" min="0.5" max="8" step="0.5" value="2">
-        <div class="range-value" id="speedValue">2.0× (≈1 menit = 1 jam)</div>
+        <div class="range-value" id="speedValue">2.0×</div>
       </div>
 
       <div class="form-row">
@@ -246,7 +240,6 @@
     </div>
   </div>
 
-  <!-- ===== BARIS 2: GRAFIK WAKTU + RIWAYAT ===== -->
   <div class="grid-2">
     <div class="panel">
       <h3>📈 Okupansi Terhadap Waktu <span class="badge">TIME SERIES</span></h3>
@@ -260,7 +253,6 @@
     </div>
   </div>
 
-  <!-- ===== BARIS 3: GRAFIK KURVA DEMAND + ANALISIS ===== -->
   <div class="grid-2">
     <div class="panel">
       <h3>📉 Kurva Permintaan &amp; Kepulangan (per jam)</h3>
@@ -285,7 +277,6 @@
 
 </div>
 
-<!-- ===== MODAL ===== -->
 <div class="modal-bg" id="modalBg">
   <div class="modal">
     <button class="close-btn" id="modalClose">✕</button>
@@ -294,66 +285,50 @@
 
     <h4>1. Variabel</h4>
     <ul>
-      <li><code>slots[f][s]</code> — status slot ke-<code>s</code> di lantai <code>f</code>: <code>null</code>, <code>'car'</code>, atau <code>'motor'</code>.</li>
-      <li><code>simTime</code> — waktu simulasi (menit sejak 00:00).</li>
-      <li><code>totalIn</code>, <code>totalOut</code>, <code>totalRejected</code> — akumulator statistik.</li>
-      <li><code>demandCurve[hour]</code> — laju kedatangan kendaraan (kendaraan/menit) pada jam tertentu.</li>
-      <li><code>departureCurve[hour]</code> — laju kepulangan kendaraan (kendaraan/menit) pada jam tertentu.</li>
+      <li><code>slots[f][s]</code> — status slot ke-<code>s</code> di lantai <code>f</code>.</li>
+      <li><code>simMinute</code> — waktu simulasi dalam menit (0–1439), mulai dari jam yang dipilih.</li>
+      <li><code>DEMAND_PER_HOUR[24]</code> &amp; <code>DEPARTURE_PER_HOUR[24]</code> — laju masuk/keluar kendaraan per jam.</li>
+      <li><code>totalIn</code>, <code>totalOut</code>, <code>totalRejected</code>, <code>processed</code> — akumulator statistik.</li>
     </ul>
 
     <h4>2. Parameter</h4>
     <table>
       <tr><th>Parameter</th><th>Nilai</th><th>Keterangan</th></tr>
-      <tr><td>Kapasitas per lantai</td><td>20</td><td>Tetap</td></tr>
+      <tr><td>Kapasitas / lantai</td><td>20</td><td>Tetap</td></tr>
       <tr><td>Jumlah lantai</td><td>3</td><td>Tetap</td></tr>
       <tr><td>Total kapasitas</td><td>60</td><td>20 × 3</td></tr>
-      <tr><td>Jam mulai simulasi</td><td>06:00 / 12:00 / 16:00</td><td>Dapat dipilih</td></tr>
-      <tr><td>Kecepatan simulasi</td><td>0.5× – 8×</td><td>1× ≈ 2 menit nyata = 1 jam simulasi</td></tr>
+      <tr><td>Jam mulai</td><td>06:00 / 12:00 / 16:00</td><td>Dapat dipilih</td></tr>
+      <tr><td>Kecepatan</td><td>0.5× – 8×</td><td>1 tick = 1 menit simulasi</td></tr>
       <tr><td>Prob. motor</td><td>0.30</td><td>Sisanya mobil</td></tr>
-      <tr><td>Tick interval dasar</td><td>2000 ms</td><td>Dibagi faktor kecepatan</td></tr>
     </table>
 
-    <h4>3. Profil Permintaan (per jam)</h4>
+    <h4>3. Profil Permintaan</h4>
     <table>
-      <tr><th>Jam</th><th>Laju Masuk (kend/jam)</th><th>Laju Keluar (kend/jam)</th><th>Catatan</th></tr>
+      <tr><th>Jam</th><th>Masuk/jam</th><th>Keluar/jam</th><th>Catatan</th></tr>
       <tr><td>06:00–07:00</td><td>80</td><td>2</td><td>Lonjakan pagi (kelas jam 7)</td></tr>
-      <tr><td>07:00–08:00</td><td>40</td><td>3</td><td>Masih banyak masuk</td></tr>
-      <tr><td>08:00–12:00</td><td>10</td><td>3</td><td>Masuk sporadis, keluar hampir nol</td></tr>
+      <tr><td>07:00–12:00</td><td>40→10</td><td>3</td><td>Masuk sporadis, keluar hampir nol → parkiran penuh</td></tr>
       <tr><td>12:00–13:00</td><td>20</td><td>55</td><td>Gelombang keluar (kelas selesai jam 12)</td></tr>
       <tr><td>13:00–16:00</td><td>8</td><td>6</td><td>Aktivitas rendah</td></tr>
       <tr><td>16:00–17:00</td><td>6</td><td>45</td><td>Gelombang keluar (kelas selesai jam 4)</td></tr>
       <tr><td>17:00–18:00</td><td>5</td><td>15</td><td>Keluar sisa</td></tr>
       <tr><td>18:00–19:00</td><td>5</td><td>30</td><td>Gelombang keluar (kelas sore selesai jam 6)</td></tr>
-      <tr><td>19:00–06:00</td><td>1</td><td>2</td><td>Aktivitas rendah / malam</td></tr>
+      <tr><td>19:00–06:00</td><td>1</td><td>2</td><td>Malam, aktivitas rendah</td></tr>
     </table>
 
     <h4>4. Asumsi</h4>
     <ul>
-      <li>Pola permintaan mengikuti kurva jam sibuk kampus: pagi lonjakan masuk, siang &amp; sore gelombang keluar.</li>
-      <li>Setiap tick simulasi = 1 menit waktu simulasi. Probabilitas masuk/keluar dihitung dari <code>laju/60</code> × faktor kecepatan.</li>
-      <li>Kendaraan yang masuk langsung menempati slot kosong pertama di lantai rekomendasi.</li>
-      <li>Kendaraan keluar dipilih dari lantai dengan okupansi tertinggi (menyeimbangkan).</li>
-      <li>Kapasitas tidak dapat dilampaui — jika penuh, kendaraan ditolak dan dicatat.</li>
+      <li>1 tick = 1 menit simulasi. Setiap tick, probabilitas masuk = <code>lajuMasuk/60</code>, keluar = <code>lajuKeluar/60</code>.</li>
+      <li>Kendaraan masuk langsung ke slot kosong pertama di lantai rekomendasi.</li>
+      <li>Kendaraan keluar dipilih dari lantai terpadat, slot terkanan.</li>
+      <li>Kapasitas tidak dapat dilampaui.</li>
     </ul>
 
-    <h4>5. Aturan Kerja Sistem</h4>
+    <h4>5. Aturan Kerja</h4>
     <ul>
-      <li><b>Rekomendasi lantai:</b> pilih lantai dengan slot kosong terbanyak. Jika seri, pilih indeks lantai terkecil.</li>
-      <li><b>Masuk:</b> jika semua lantai penuh → tolak &amp; catat. Jika ada → tempatkan di lantai rekomendasi, <code>totalIn++</code>.</li>
-      <li><b>Keluar:</b> hanya jika ada slot terisi. Pilih lantai terpadat, keluarkan slot terkanan.</li>
-      <li><b>Anti double-count:</b> state <code>slots</code> hanya diubah <b>sekali</b> di <code>commitEnter</code>/<code>commitExit</code> setelah animasi selesai. Slot yang dianimasikan dikunci (<code>lockedSlots</code>) dan <code>pointer-events:none</code>.</li>
-      <li><b>Grafik &amp; riwayat:</b> diperbarui setiap commit, sehingga konsisten dengan kondisi parkiran.</li>
+      <li><b>Rekomendasi lantai:</b> slot kosong terbanyak; seri → indeks terkecil.</li>
+      <li><b>Anti double-count:</b> state <code>slots</code> hanya diubah sekali di <code>commitEnter</code>/<code>commitExit</code> setelah animasi selesai. Slot dikunci via <code>lockedSlots</code>.</li>
+      <li>Grafik &amp; riwayat diperbarui setiap commit → konsisten.</li>
     </ul>
-
-    <h4>6. Output Simulasi</h4>
-    <ul>
-      <li>Total masuk, keluar, ditolak, diproses.</li>
-      <li>Persentase keterisian per lantai &amp; keseluruhan.</li>
-      <li>Lantai paling padat, waktu simulasi berjalan.</li>
-      <li>Grafik batang (per lantai), grafik waktu (time series), grafik kurva permintaan.</li>
-      <li>Riwayat aktivitas berstempel jam simulasi.</li>
-    </ul>
-    <p style="margin-top:12px;font-size:.75rem;color:#6c8da8">*Simulasi edukasi untuk mata kuliah Pemodelan &amp; Simulasi Sistem.</p>
   </div>
 </div>
 
@@ -363,65 +338,51 @@
 (function(){
   'use strict';
 
-  // ============================================================
-  // KONSTANTA
-  // ============================================================
   const CAP = 20, FLOORS = 3;
-  const TICK_MS_BASE = 2000; // 1 tick = 1 menit simulasi pada speed 1×
+  const TICK_MS_BASE = 1000; // 1 tick = 1 menit simulasi pada speed 1×
 
-  // ==== PROFIL PERMINTAAN (kendaraan per JAM) ====
-  // Indeks 0..23 = jam 00:00 .. 23:00
-  // Laju masuk per jam (kendaraan/jam)
   const DEMAND_PER_HOUR = [
-    1, 1, 1, 1, 1, 1,          // 00-05 malam
-    80,                        // 06 (lonjakan pagi)
-    40, 10, 10, 10,            // 07, 08, 09, 10, 11 (masuk sporadis)
-    20,                        // 12 (sebagian masih masuk)
-    8, 8, 8,                   // 13-15
-    6,                         // 16
-    5, 5,                      // 17-18
-    1, 1, 1, 1, 1              // 19-23 malam
+    1,1,1,1,1,1,
+    80,
+    40,10,10,10,10,
+    20,
+    8,8,8,
+    6,
+    5,5,
+    1,1,1,1,1
   ];
-  // Laju keluar per jam (kendaraan/jam)
   const DEPARTURE_PER_HOUR = [
-    2, 1, 1, 1, 1, 1,          // 00-05 malam
-    2,                         // 06
-    3, 3, 3, 3,                // 07-11
-    55,                        // 12 (gelombang keluar jam 12)
-    6, 6, 6,                   // 13-15
-    45,                        // 16 (gelombang keluar jam 4)
-    15,                        // 17
-    30,                        // 18 (gelombang keluar jam 6)
-    2, 2, 2, 2, 2              // 19-23 malam
+    2,1,1,1,1,1,
+    2,
+    3,3,3,3,3,
+    55,
+    6,6,6,
+    45,
+    15,30,
+    2,2,2,2,2
   ];
 
+  // fase dengan wrapping yang benar
   const PHASES = [
-    { id:'pagi',       label:'Pagi (lonjakan masuk)',    from:6*60,  to:7*60,   enterRate:80, exitRate:2 },
-    { id:'pagi_akhir', label:'Masuk sporadis',           from:7*60,  to:12*60,  enterRate:10, exitRate:3 },
-    { id:'siang',      label:'Siang (gelombang keluar)', from:12*60, to:13*60,  enterRate:20, exitRate:55 },
-    { id:'sore',       label:'Sore (gelombang keluar)',  from:16*60, to:17*60,  enterRate:6,  exitRate:45 },
-    { id:'petang',     label:'Petang (gelombang keluar)',from:18*60, to:19*60,  enterRate:5,  exitRate:30 },
-    { id:'malam',      label:'Malam (aktivitas rendah)', from:19*60, to:24*60+6*60, enterRate:1, exitRate:2 }
+    { id:'pagi',       label:'Pagi',           from:6*60,  to:7*60 },
+    { id:'pagi_akhir', label:'Masuk Sporadis', from:7*60,  to:12*60 },
+    { id:'siang',      label:'Siang',          from:12*60, to:13*60 },
+    { id:'sore',       label:'Sore',           from:16*60, to:17*60 },
+    { id:'petang',     label:'Petang',         from:18*60, to:19*60 },
+    { id:'malam',      label:'Malam',          from:19*60, to:24*60 },
+    { id:'malam',      label:'Malam',          from:0,     to:6*60 }
   ];
 
-  // ============================================================
-  // STATE
-  // ============================================================
   let slots = [Array(CAP).fill(null), Array(CAP).fill(null), Array(CAP).fill(null)];
   let lockedSlots = new Set();
-  let simMinute = 6*60;        // waktu simulasi dalam MENIT, mulai 06:00
+  let simMinute = 6*60;
   let totalIn = 0, totalOut = 0, totalRejected = 0, processed = 0;
   let targetCount = 200;
   let speed = 2;
   let startHour = 6;
   let running = false, paused = false;
   let simInterval = null;
-  let timeSeries = [];
-  let lastLogMinute = -1;
 
-  // ============================================================
-  // DOM
-  // ============================================================
   const $ = id => document.getElementById(id);
   const buildingEl = $('building');
   const hudTime = $('hudTime'), hudTime2 = $('hudTime2'), hudPhase = $('hudPhase');
@@ -444,9 +405,6 @@
   const modalBg = $('modalBg'), modalClose = $('modalClose');
   const toastEl = $('toast');
 
-  // ============================================================
-  // UTIL
-  // ============================================================
   let toastTimer;
   function showToast(msg, type='info') {
     toastEl.textContent = msg;
@@ -454,70 +412,47 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 2000);
   }
-  function vibrate(ms=20){ if(navigator.vibrate) navigator.vibrate(ms); }
 
-  let audioCtx;
-  function beep(freq=660, dur=0.06, type='sine') {
-    try {
-      if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-      if (audioCtx.state==='suspended') audioCtx.resume();
-      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-      o.type=type; o.frequency.value=freq;
-      g.gain.setValueAtTime(0.03, audioCtx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+dur);
-      o.connect(g); g.connect(audioCtx.destination);
-      o.start(); o.stop(audioCtx.currentTime+dur);
-    } catch(e){}
+  function formatMin(min) {
+    const m = ((min % 1440) + 1440) % 1440;
+    const h = Math.floor(m/60);
+    const mm = m % 60;
+    return String(h).padStart(2,'0') + ':' + String(mm).padStart(2,'0');
+  }
+
+  function currentHour() {
+    return Math.floor((((simMinute % 1440) + 1440) % 1440) / 60);
+  }
+
+  function getRates(hour) {
+    return {
+      enter: DEMAND_PER_HOUR[hour] ?? 5,
+      exit:  DEPARTURE_PER_HOUR[hour] ?? 5
+    };
+  }
+
+  function getPhase() {
+    const m = ((simMinute % 1440) + 1440) % 1440;
+    for (const p of PHASES) {
+      if (m >= p.from && m < p.to) return p;
+    }
+    return PHASES[0];
+  }
+
+  function getProbs() {
+    const r = getRates(currentHour());
+    return {
+      enter: Math.min(0.99, r.enter/60),
+      exit:  Math.min(0.99, r.exit/60),
+      enterRate: r.enter,
+      exitRate: r.exit
+    };
   }
 
   const countOccupied = fi => slots[fi].filter(v=>v!==null).length;
   const totalOccupied = () => slots.reduce((s,f)=>s+f.filter(v=>v!==null).length,0);
   const freeSlots = fi => CAP - countOccupied(fi);
 
-  function formatMin(min) {
-    const h = Math.floor(min/60) % 24;
-    const m = min % 60;
-    return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
-  }
-
-  function currentHour() {
-    return Math.floor(simMinute/60) % 24;
-  }
-
-  // ============================================================
-  // PROFIL PERMINTAAN DINAMIS
-  // ============================================================
-  function getRates(hour) {
-    const e = DEMAND_PER_HOUR[hour] ?? 5;
-    const x = DEPARTURE_PER_HOUR[hour] ?? 5;
-    return { enter: e, exit: x };
-  }
-
-  function getPhase(minute) {
-    const m = minute % (24*60);
-    for (const p of PHASES) {
-      if (m >= p.from && m < p.to) return p;
-    }
-    return PHASES[PHASES.length-1];
-  }
-
-  // probabilitas per TICK (1 menit simulasi)
-  function getProbs() {
-    const hour = currentHour();
-    const r = getRates(hour);
-    const enterPerMin = r.enter / 60;
-    const exitPerMin = r.exit / 60;
-    return {
-      enter: Math.min(0.99, enterPerMin),
-      exit:  Math.min(0.99, exitPerMin),
-      enterRate: r.enter,
-      exitRate: r.exit
-    };
-  }
-
-  // ============================================================
-  // REKOMENDASI LANTAI
-  // ============================================================
   function recommendFloor() {
     let best = -1, bestFree = -1;
     for (let f=0; f<FLOORS; f++) {
@@ -527,83 +462,71 @@
     return bestFree > 0 ? best : -1;
   }
 
-  // ============================================================
-  // CHART.JS
-  // ============================================================
+  // ===== CHART =====
   const chartColors = ['#2d9cdb','#2ecc71','#f1c40f'];
-  const barCtx = document.getElementById('barChart').getContext('2d');
-  const barChart = new Chart(barCtx, {
+  const barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
     type: 'bar',
     data: {
       labels: ['Lantai 1','Lantai 2','Lantai 3'],
-      datasets: [{
-        label: 'Kendaraan',
-        data: [0,0,0],
+      datasets: [{ label:'Kendaraan', data:[0,0,0],
         backgroundColor: chartColors.map(c=>c+'cc'),
-        borderColor: chartColors,
-        borderWidth: 2, borderRadius: 6
-      }]
+        borderColor: chartColors, borderWidth: 2, borderRadius: 6 }]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
       plugins: { legend: { display: false } },
       scales: {
-        y: { beginAtZero: true, max: 20, ticks: { color: '#6c8da8', stepSize: 5 }, grid: { color: '#1c3d56' } },
-        x: { ticks: { color: '#8ab0cf' }, grid: { display: false } }
+        y: { beginAtZero: true, max: 20, ticks: { color:'#6c8da8', stepSize:5 }, grid:{ color:'#1c3d56' } },
+        x: { ticks: { color:'#8ab0cf' }, grid:{ display:false } }
       }
     }
   });
 
-  const lineCtx = document.getElementById('lineChart').getContext('2d');
-  const lineChart = new Chart(lineCtx, {
+  const lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
     type: 'line',
     data: {
       labels: [],
       datasets: [
-        { label: 'Lantai 1', data: [], borderColor: '#2d9cdb', backgroundColor: 'rgba(45,156,219,0.08)', tension: 0.3, fill: true, pointRadius: 0, borderWidth: 2 },
-        { label: 'Lantai 2', data: [], borderColor: '#2ecc71', backgroundColor: 'rgba(46,204,113,0.08)', tension: 0.3, fill: true, pointRadius: 0, borderWidth: 2 },
-        { label: 'Lantai 3', data: [], borderColor: '#f1c40f', backgroundColor: 'rgba(241,196,15,0.08)', tension: 0.3, fill: true, pointRadius: 0, borderWidth: 2 }
+        { label:'Lantai 1', data:[], borderColor:'#2d9cdb', backgroundColor:'rgba(45,156,219,0.08)', tension:0.3, fill:true, pointRadius:0, borderWidth:2 },
+        { label:'Lantai 2', data:[], borderColor:'#2ecc71', backgroundColor:'rgba(46,204,113,0.08)', tension:0.3, fill:true, pointRadius:0, borderWidth:2 },
+        { label:'Lantai 3', data:[], borderColor:'#f1c40f', backgroundColor:'rgba(241,196,15,0.08)', tension:0.3, fill:true, pointRadius:0, borderWidth:2 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
-      plugins: { legend: { labels: { color: '#8ab0cf', font: { size: 9 }, boxWidth: 10 } } },
+      plugins: { legend: { labels: { color:'#8ab0cf', font:{size:9}, boxWidth:10 } } },
       scales: {
-        y: { beginAtZero: true, max: 20, ticks: { color: '#6c8da8', stepSize: 5, font: { size: 9 } }, grid: { color: '#1c3d56' } },
-        x: { ticks: { color: '#6c8da8', font: { size: 8 }, maxTicksLimit: 8 }, grid: { display: false } }
+        y: { beginAtZero: true, max: 20, ticks:{ color:'#6c8da8', stepSize:5, font:{size:9} }, grid:{ color:'#1c3d56' } },
+        x: { ticks:{ color:'#6c8da8', font:{size:8}, maxTicksLimit:8 }, grid:{ display:false } }
       }
     }
   });
 
-  // Demand curve chart (per jam 00-23)
-  const demandCtx = document.getElementById('demandChart').getContext('2d');
   const demandLabels = Array.from({length:24}, (_,h)=>String(h).padStart(2,'0')+':00');
-  const demandChart = new Chart(demandCtx, {
+  const demandChart = new Chart(document.getElementById('demandChart').getContext('2d'), {
     type: 'line',
     data: {
       labels: demandLabels,
       datasets: [
-        { label: 'Laju Masuk (kend/jam)', data: DEMAND_PER_HOUR, borderColor: '#2ecc71', backgroundColor: 'rgba(46,204,113,0.15)', tension: 0.35, fill: true, pointRadius: 2, borderWidth: 2 },
-        { label: 'Laju Keluar (kend/jam)', data: DEPARTURE_PER_HOUR, borderColor: '#f1c40f', backgroundColor: 'rgba(241,196,15,0.15)', tension: 0.35, fill: true, pointRadius: 2, borderWidth: 2 }
+        { label:'Masuk (kend/jam)', data: DEMAND_PER_HOUR, borderColor:'#2ecc71', backgroundColor:'rgba(46,204,113,0.15)', tension:0.35, fill:true, pointRadius:2, borderWidth:2 },
+        { label:'Keluar (kend/jam)', data: DEPARTURE_PER_HOUR, borderColor:'#f1c40f', backgroundColor:'rgba(241,196,15,0.15)', tension:0.35, fill:true, pointRadius:2, borderWidth:2 }
       ]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#8ab0cf', font: { size: 9 }, boxWidth: 10 } } },
+      responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
+      plugins: { legend: { labels: { color:'#8ab0cf', font:{size:9}, boxWidth:10 } } },
       scales: {
-        y: { beginAtZero: true, ticks: { color: '#6c8da8', font: { size: 9 } }, grid: { color: '#1c3d56' } },
-        x: { ticks: { color: '#6c8da8', font: { size: 8 }, maxTicksLimit: 12 }, grid: { display: false } }
+        y: { beginAtZero: true, ticks:{ color:'#6c8da8', font:{size:9} }, grid:{ color:'#1c3d56' } },
+        x: { ticks:{ color:'#6c8da8', font:{size:8}, maxTicksLimit:12 }, grid:{ display:false } }
       }
     }
   });
-  // garis vertikal penanda jam simulasi
+
   const markerPlugin = {
     id: 'simMarker',
     afterDraw(chart) {
-      if (!chart.data.labels.length) return;
       const h = currentHour();
-      const idx = h;
-      const x = chart.scales.x.getPixelForValue(idx);
+      const x = chart.scales.x.getPixelForValue(h);
       const ctx = chart.ctx;
       ctx.save();
       ctx.strokeStyle = '#e74c3c';
@@ -618,9 +541,6 @@
   };
   demandChart.config.plugins = [markerPlugin];
 
-  // ============================================================
-  // LOG
-  // ============================================================
   function addLog(type, msg) {
     if (logList.firstChild && logList.firstChild.textContent.includes('Belum ada')) logList.innerHTML = '';
     const div = document.createElement('div');
@@ -631,32 +551,24 @@
     logCount.textContent = logList.children.length + ' entri';
   }
 
-  // ============================================================
-  // RENDER
-  // ============================================================
   function render() {
     const total = totalOccupied();
     const cap = CAP*FLOORS;
-    const avail = cap-total;
-    const pct = Math.round(total/cap*100);
     hudOccupied.textContent = total;
-    hudAvailable.textContent = avail;
-    hudPercent.textContent = pct+'%';
+    hudAvailable.textContent = cap-total;
+    hudPercent.textContent = Math.round(total/cap*100)+'%';
     hudRejected.textContent = totalRejected;
     hudTime.textContent = formatMin(simMinute);
     hudTime2.textContent = formatMin(simMinute);
     anSimTime.textContent = formatMin(simMinute);
 
-    const phase = getPhase(simMinute);
-    hudPhase.textContent = phase.label.split('(')[0].trim();
-
-    // update phase pills
+    const phase = getPhase();
+    hudPhase.textContent = phase.label;
     document.querySelectorAll('.phase-pill').forEach(el=>{
       el.classList.toggle('active', el.dataset.phase === phase.id);
     });
 
     const recFloor = recommendFloor();
-
     buildingEl.querySelectorAll('.floor-row').forEach(e=>e.remove());
 
     let html = '';
@@ -671,10 +583,9 @@
       for (let s=0;s<CAP;s++){
         const v = slots[i][s];
         const filled = v!==null;
-        const lockKey = i+'-'+s;
-        const locked = lockedSlots.has(lockKey);
+        const locked = lockedSlots.has(i+'-'+s);
         const icon = filled ? (v==='motor'?'🏍️':'🚗') : '';
-        slotHtml += `<div class="slot ${filled?'terisi':'kosong'}" data-floor="${i}" data-slot="${s}" data-filled="${filled}" data-locked="${locked}" style="${locked?'pointer-events:none;opacity:.7':''}">${filled?`<span class="veh">${icon}</span>`:''}</div>`;
+        slotHtml += `<div class="slot ${filled?'terisi':'kosong'}" data-floor="${i}" data-slot="${s}" data-filled="${filled}" style="${locked?'pointer-events:none;opacity:.7':''}">${filled?`<span class="veh">${icon}</span>`:''}</div>`;
       }
 
       html += `
@@ -704,9 +615,6 @@
     updateRatesDisplay();
   }
 
-  // ============================================================
-  // UPDATE CHART
-  // ============================================================
   function updateCharts() {
     barChart.data.datasets[0].data = [countOccupied(0), countOccupied(1), countOccupied(2)];
     barChart.update('none');
@@ -732,9 +640,6 @@
     curExitRate.textContent = p.exitRate + ' kend/jam';
   }
 
-  // ============================================================
-  // ANALISIS
-  // ============================================================
   function updateAnalysis() {
     anTotalIn.textContent = totalIn;
     anTotalOut.textContent = totalOut;
@@ -744,13 +649,9 @@
     const occs = [countOccupied(0), countOccupied(1), countOccupied(2)];
     const maxOcc = Math.max(...occs);
     let busiest = '—';
-    if (maxOcc > 0) {
-      const idx = occs.indexOf(maxOcc);
-      busiest = `Lantai ${idx+1} (${maxOcc})`;
-    }
+    if (maxOcc > 0) busiest = `Lantai ${occs.indexOf(maxOcc)+1} (${maxOcc})`;
     anBusiest.textContent = busiest;
-    const total = totalOccupied();
-    anOverall.textContent = Math.round(total/(CAP*FLOORS)*100) + '%';
+    anOverall.textContent = Math.round(totalOccupied()/(CAP*FLOORS)*100) + '%';
 
     const fmt = (f) => {
       const o = countOccupied(f);
@@ -761,9 +662,7 @@
     anF3.textContent = fmt(2);
   }
 
-  // ============================================================
-  // ANIMASI MASUK
-  // ============================================================
+  // ===== ANIMASI =====
   function animateEnter(floorIdx, slotIdx, vt) {
     const lockKey = floorIdx+'-'+slotIdx;
     lockedSlots.add(lockKey);
@@ -774,7 +673,6 @@
     const targetSlot = slotsEl.querySelector(`.slot[data-slot="${slotIdx}"]`);
     if (!targetSlot) { commitEnter(floorIdx, slotIdx, vt); return; }
 
-    targetSlot.dataset.locked = 'true';
     targetSlot.style.pointerEvents = 'none';
     targetSlot.style.opacity = '0.7';
 
@@ -786,7 +684,7 @@
     const veh = document.createElement('div');
     veh.className = 'vehicle ' + vt;
     veh.textContent = icon;
-    veh.style.left = 30 + 'px';
+    veh.style.left = '30px';
     veh.style.top = (bRect.height - 40) + 'px';
     veh.style.opacity = '0';
     buildingEl.appendChild(veh);
@@ -799,9 +697,8 @@
     requestAnimationFrame(()=>{
       veh.style.opacity='1';
       veh.style.transition=`left ${0.6*speedMul}s ease-in-out, top ${0.5*speedMul}s ease-in-out`;
-      veh.style.left = 40 + 'px';
+      veh.style.left = '40px';
       veh.style.top = laneY + 'px';
-      beep(500, 0.05, 'triangle');
     });
     setTimeout(()=>{
       veh.style.transition=`left ${0.7*speedMul}s ease-in-out`;
@@ -810,7 +707,6 @@
     setTimeout(()=>{
       veh.style.transition=`top ${0.4*speedMul}s ease-out`;
       veh.style.top = targetY + 'px';
-      beep(780, 0.06);
     }, 1350*speedMul);
     setTimeout(()=>{
       veh.remove();
@@ -825,17 +721,12 @@
       totalIn++;
       processed++;
       addLog('in', `⬆ ${vt==='motor'?'Motor':'Mobil'} masuk → L${floorIdx+1} slot ${slotIdx+1}`);
-      timeSeries.push({t: simMinute, v: totalOccupied()});
     }
     render();
-    vibrate(15);
     updateProgress();
     checkFinished();
   }
 
-  // ============================================================
-  // ANIMASI KELUAR
-  // ============================================================
   function animateExit(floorIdx, slotIdx, vt) {
     const lockKey = floorIdx+'-'+slotIdx;
     lockedSlots.add(lockKey);
@@ -859,7 +750,7 @@
     veh.style.transition='none';
     buildingEl.appendChild(veh);
 
-    commitExit(floorIdx, slotIdx, true);
+    commitExit(floorIdx, slotIdx);
 
     const laneY = fRect.bottom - bRect.top - 12;
     const speedMul = 1 / Math.max(0.5, speed);
@@ -867,19 +758,17 @@
     requestAnimationFrame(()=>{
       veh.style.transition=`top ${0.35*speedMul}s ease-out`;
       veh.style.top = laneY + 'px';
-      beep(450,0.06,'triangle');
     });
     setTimeout(()=>{
       veh.style.transition=`left ${0.6*speedMul}s ease-in-out, top ${0.5*speedMul}s ease-in-out, opacity 0.3s`;
-      veh.style.left = 20 + 'px';
+      veh.style.left = '20px';
       veh.style.top = (bRect.height - 30) + 'px';
       veh.style.opacity='0.2';
     }, 380*speedMul);
     setTimeout(()=>{ veh.remove(); lockedSlots.delete(lockKey); }, 1100*speedMul);
-    vibrate(15);
   }
 
-  function commitExit(floorIdx, slotIdx, silent=false) {
+  function commitExit(floorIdx, slotIdx) {
     lockedSlots.delete(floorIdx+'-'+slotIdx);
     const vt = slots[floorIdx][slotIdx];
     if (vt!==null) {
@@ -887,36 +776,28 @@
       totalOut++;
       processed++;
       addLog('out', `⬇ ${vt==='motor'?'Motor':'Mobil'} keluar ← L${floorIdx+1} slot ${slotIdx+1}`);
-      timeSeries.push({t: simMinute, v: totalOccupied()});
-      if (!silent) beep(480,0.06,'triangle');
     }
     render();
-    if (!silent) vibrate(15);
     updateProgress();
     checkFinished();
   }
 
-  // ============================================================
-  // MASUK / KELUAR PUBLIK
-  // ============================================================
+  // ===== OPERASI =====
   function tryEnter() {
     const rec = recommendFloor();
     if (rec === -1) {
       totalRejected++;
       processed++;
       addLog('reject', `✕ Ditolak — semua lantai penuh (${formatMin(simMinute)})`);
-      showToast('❌ Semua lantai penuh! Kendaraan ditolak.', 'error');
-      beep(200,0.12,'sawtooth');
       render();
       updateProgress();
       checkFinished();
       return false;
     }
-    let slotIdx = slots[rec].indexOf(null);
+    const slotIdx = slots[rec].indexOf(null);
     if (slotIdx === -1) {
       totalRejected++;
       processed++;
-      addLog('reject', `✕ Ditolak — lantai rekomendasi penuh`);
       render(); updateProgress(); checkFinished();
       return false;
     }
@@ -942,15 +823,11 @@
     return true;
   }
 
-  // ============================================================
-  // KLIK SLOT
-  // ============================================================
   function handleSlotClick(slot) {
     const fi = parseInt(slot.dataset.floor,10);
     const si = parseInt(slot.dataset.slot,10);
     if (lockedSlots.has(fi+'-'+si)) return;
-    const filled = slots[fi][si]!==null;
-    if (filled) {
+    if (slots[fi][si]!==null) {
       const vt = slots[fi][si];
       showToast(`⬇ ${vt==='motor'?'Motor':'Mobil'} keluar L${fi+1}`,'success');
       animateExit(fi, si, vt);
@@ -961,44 +838,29 @@
     }
   }
 
-  // ============================================================
-  // TICK MESIN SIMULASI
-  // ============================================================
+  // ===== TICK =====
   function tick() {
     if (!running || paused) return;
 
-    // maju 1 menit simulasi
-    simMinute++;
-    if (simMinute >= 24*60) simMinute = 0; // wrap 24 jam
+    // maju 1 menit simulasi SETIAP tick
+    simMinute = (simMinute + 1) % 1440;
 
     const p = getProbs();
-    const doEnter = Math.random() < p.enter;
-    const doExit = Math.random() < p.exit;
 
-    // bila keduanya terpicu, prioritaskan masuk jika masuk > keluar
-    if (doEnter && doExit) {
-      if (p.enterRate >= p.exitRate) {
-        if (tryEnter()) return;
-        tryExit();
-      } else {
-        if (tryExit()) return;
-        tryEnter();
-      }
-    } else if (doEnter) {
-      tryEnter();
-    } else if (doExit) {
-      tryExit();
-    }
-    // jika tidak ada kejadian, tidak apa-apa (1 menit kosong)
-    render(); // update jam & rate
+    // lakukan hingga 1 event masuk DAN 1 event keluar jika probabilitas memungkinkan
+    const doEnter = Math.random() < p.enter;
+    const doExit  = Math.random() < p.exit;
+
+    if (doEnter) tryEnter();
+    if (doExit)  tryExit();
+
+    // render selalu dipanggil agar jam & probabilitas bergerak
+    render();
   }
 
-  // ============================================================
-  // MESIN
-  // ============================================================
+  // ===== MESIN =====
   function scheduleInterval() {
     if (simInterval) clearInterval(simInterval);
-    // 1 tick = 1 menit simulasi. interval nyata = TICK_MS_BASE / speed
     const ms = Math.round(TICK_MS_BASE / Math.max(0.5, speed));
     simInterval = setInterval(() => {
       if (!running || paused) return;
@@ -1029,7 +891,6 @@
     simStatusBadge.style.color = '#f1c40f';
     pauseBtn.disabled = true;
     resumeBtn.disabled = false;
-    showToast('⏸ Simulasi dijeda', 'info');
   }
 
   function resumeSim() {
@@ -1039,7 +900,6 @@
     simStatusBadge.style.color = '#2ecc71';
     pauseBtn.disabled = false;
     resumeBtn.disabled = true;
-    showToast('⏵ Simulasi dilanjutkan', 'success');
   }
 
   function stopSim(reason) {
@@ -1065,7 +925,6 @@
     startHour = parseInt(startHourSelect.value, 10) || 6;
     simMinute = startHour * 60;
     totalIn = 0; totalOut = 0; totalRejected = 0; processed = 0;
-    timeSeries = [];
     logList.innerHTML = '<div style="color:#6c8da8;font-size:.75rem;padding:8px;text-align:center">Belum ada aktivitas. Klik "Mulai".</div>';
     logCount.textContent = '0 entri';
     lineChart.data.labels = [];
@@ -1090,9 +949,7 @@
     if (processed >= targetCount && running) stopSim('target');
   }
 
-  // ============================================================
-  // EVENTS
-  // ============================================================
+  // ===== EVENTS =====
   startBtn.addEventListener('click', startSim);
   pauseBtn.addEventListener('click', pauseSim);
   resumeBtn.addEventListener('click', resumeSim);
@@ -1106,8 +963,7 @@
 
   speedRange.addEventListener('input', (e) => {
     speed = parseFloat(e.target.value);
-    const minPerSec = speed * 0.5;
-    speedValue.textContent = speed.toFixed(1) + '× (≈1 menit = ' + (speed/2).toFixed(1) + ' jam)';
+    speedValue.textContent = speed.toFixed(1) + '×';
     if (running) scheduleInterval();
   });
 
@@ -1136,14 +992,12 @@
 
   window.addEventListener('beforeunload', () => { if (simInterval) clearInterval(simInterval); });
 
-  // ============================================================
-  // INIT
-  // ============================================================
+  // ===== INIT =====
   function init() {
     startHour = parseInt(startHourSelect.value, 10) || 6;
     simMinute = startHour * 60;
     speed = parseFloat(speedRange.value) || 2;
-    speedValue.textContent = speed.toFixed(1) + '× (≈1 menit = ' + (speed/2).toFixed(1) + ' jam)';
+    speedValue.textContent = speed.toFixed(1) + '×';
     targetCount = parseInt(targetCountInput.value) || 200;
     render();
     updateProgress();
