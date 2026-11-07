@@ -3,174 +3,145 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SMART PARKING UPI – Simulasi Interaktif</title>
+<title>SMART PARKING UPI – Parking Simulator</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Roboto,system-ui,sans-serif}
-  body{background:radial-gradient(circle at 20% 10%,#0f2a3f,#050e17 90%);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:18px;overflow-x:hidden}
-  .app{max-width:1450px;width:100%;background:rgba(8,22,34,.75);backdrop-filter:blur(14px);border-radius:40px;padding:26px 30px;border:1px solid rgba(90,170,230,.15);box-shadow:0 40px 80px -20px #000,inset 0 1px 0 rgba(255,255,255,.06)}
+  body{background:#050e17;min-height:100vh;overflow-x:hidden;color:#fff}
 
-  .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:22px}
-  h1{font-size:1.9rem;letter-spacing:2px;color:#fff;display:flex;align-items:center;gap:12px;text-shadow:0 0 24px #2d9cdb88}
-  h1 span{background:linear-gradient(135deg,#2d9cdb,#1f6e9e);font-size:.78rem;padding:6px 16px;border-radius:40px;letter-spacing:1px;box-shadow:0 0 20px #2d9cdb66;animation:pulse 2s infinite}
-  @keyframes pulse{0%,100%{box-shadow:0 0 12px #2d9cdb66}50%{box-shadow:0 0 26px #2d9cdbcc}}
-  .subhead{color:#8ab0cf;font-size:.85rem;margin-top:4px;letter-spacing:.4px}
+  /* ===== TOP HUD (seperti game) ===== */
+  .hud{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:10px 18px;background:linear-gradient(180deg,rgba(5,20,32,.95),rgba(5,20,32,.75));backdrop-filter:blur(10px);border-bottom:1px solid #1a3a52;gap:14px;flex-wrap:wrap}
+  .hud-left{display:flex;align-items:center;gap:14px}
+  .logo{font-size:1.1rem;font-weight:800;letter-spacing:1.5px;display:flex;align-items:center;gap:8px}
+  .logo span{background:linear-gradient(135deg,#2d9cdb,#1f6e9e);font-size:.6rem;padding:4px 10px;border-radius:20px;letter-spacing:1px;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 
-  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-  .stat-card{background:linear-gradient(160deg,rgba(20,48,70,.9),rgba(8,22,34,.9));border-radius:22px;padding:14px 18px;border:1px solid rgba(90,170,230,.12);position:relative;overflow:hidden;transition:.25s}
-  .stat-card:hover{transform:translateY(-3px);border-color:#2d9cdb55}
-  .stat-card::after{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#2d9cdb,transparent)}
-  .stat-label{font-size:.72rem;text-transform:uppercase;letter-spacing:1.4px;color:#7fa4c4;font-weight:600}
-  .stat-value{font-size:2.4rem;font-weight:800;color:#fff;line-height:1.1;margin-top:2px;transition:.2s}
-  .stat-value.bump{transform:scale(1.15);color:#6ab8f0}
-  .stat-unit{font-size:1rem;font-weight:400;color:#8ab0cf}
-  .stat-sub{font-size:.75rem;color:#6c8da8}
-  .global-progress{height:7px;background:#0a1a26;border-radius:20px;margin-top:8px;overflow:hidden}
-  .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#2d9cdb,#6ab8f0,#a0e0ff);border-radius:20px;transition:width .45s cubic-bezier(.4,0,.2,1)}
+  .hud-stats{display:flex;gap:10px;flex-wrap:wrap}
+  .hud-chip{background:#0c2233;border:1px solid #1c3d56;border-radius:12px;padding:6px 14px;display:flex;flex-direction:column;min-width:80px}
+  .hud-chip .lbl{font-size:.55rem;text-transform:uppercase;letter-spacing:1px;color:#6c8da8;font-weight:700}
+  .hud-chip .val{font-size:1.15rem;font-weight:800;line-height:1.1}
+  .hud-chip .val.green{color:#2ecc71}
+  .hud-chip .val.blue{color:#2d9cdb}
+  .hud-chip .val.orange{color:#f1c40f}
 
-  .main-grid{display:grid;grid-template-columns:1.35fr .85fr;gap:22px;align-items:start}
+  /* ===== SCENE (GEDUNG PARKIR) ===== */
+  .scene-wrap{position:relative;width:100%;max-width:1500px;margin:0 auto;padding:30px 20px 20px;min-height:calc(100vh - 90px);display:flex;justify-content:center}
 
-  .building-wrap{position:relative;background:linear-gradient(180deg,#071520,#040c14);border-radius:28px;padding:20px 18px 12px;border:1px solid #1a3a52;box-shadow:inset 0 0 60px #00000080,0 20px 40px -20px #000}
-  .building-roof{height:14px;background:linear-gradient(90deg,#14344a,#0c2233);border-radius:14px 14px 0 0;margin:0 10px -2px;position:relative}
-  .building-roof::after{content:'UPI PARKING';position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:.65rem;letter-spacing:4px;color:#2d9cdb88;font-weight:700}
+  .building{position:relative;width:100%;max-width:1200px;background:linear-gradient(180deg,#0a1826,#061019);border-radius:14px 14px 4px 4px;border:2px solid #1c3d56;box-shadow:0 30px 80px -20px #000,inset 0 0 100px #00000080;padding:14px 14px 26px;margin-top:10px}
+  .building::before{content:'UPI SMART PARKING';position:absolute;top:-32px;left:50%;transform:translateX(-50%);font-size:.75rem;letter-spacing:6px;color:#2d9cdb;font-weight:800;text-shadow:0 0 20px #2d9cdb88;white-space:nowrap}
+  .building::after{content:'';position:absolute;bottom:-6px;left:-6px;right:-6px;height:8px;background:linear-gradient(90deg,#0f2a3f,#1f6e9e,#0f2a3f);border-radius:0 0 10px 10px;box-shadow:0 6px 20px #1f6e9e66}
 
-  /* === FLOOR dengan jalur animasi === */
-  .floor-card{background:linear-gradient(180deg,#0e2536,#0a1c2a);border-radius:18px;padding:12px 14px;margin-bottom:10px;border:1px solid #1c3d56;position:relative;transition:border-color .3s,box-shadow .3s;overflow:hidden}
-  .floor-card.led-hijau{border-left:6px solid #2ecc71;box-shadow:0 0 18px #2ecc7133}
-  .floor-card.led-kuning{border-left:6px solid #f1c40f;box-shadow:0 0 18px #f1c40f33}
-  .floor-card.led-merah{border-left:6px solid #e74c3c;box-shadow:0 0 18px #e74c3c33}
+  /* ===== FLOOR ROW ===== */
+  .floor-row{position:relative;display:flex;align-items:stretch;margin-bottom:8px;border-radius:8px;background:#0d1f2e;border:1px solid #1a3a52;overflow:hidden;transition:box-shadow .3s}
+  .floor-row.led-hijau{box-shadow:inset 4px 0 0 #2ecc71,0 0 24px #2ecc7133}
+  .floor-row.led-kuning{box-shadow:inset 4px 0 0 #f1c40f,0 0 24px #f1c40f33}
+  .floor-row.led-merah{box-shadow:inset 4px 0 0 #e74c3c,0 0 24px #e74c3c33}
 
-  .floor-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:10px;flex-wrap:wrap}
-  .floor-name{font-size:1rem;font-weight:700;color:#dbeaf6;letter-spacing:.6px}
-  .floor-status{font-size:.65rem;font-weight:700;padding:3px 12px;border-radius:30px;letter-spacing:.8px;text-transform:uppercase;transition:.3s}
-  .led-hijau .floor-status{background:#123d26;color:#7ff0a8;box-shadow:0 0 12px #2ecc7155}
-  .led-kuning .floor-status{background:#3d3412;color:#ffe57a;box-shadow:0 0 12px #f1c40f55}
-  .led-merah .floor-status{background:#3d1212;color:#ff9e9e;box-shadow:0 0 12px #e74c3c55}
-  .floor-count{font-size:.78rem;color:#8ab0cf;font-weight:600;margin-left:auto}
+  /* label lantai di kiri */
+  .floor-label{flex:0 0 78px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;background:linear-gradient(90deg,#08141f,#0d1f2e);border-right:1px solid #1a3a52;gap:3px;z-index:3}
+  .floor-label .num{font-size:.95rem;font-weight:800;letter-spacing:.5px}
+  .floor-label .led{width:9px;height:9px;border-radius:50%;background:#2ecc71;box-shadow:0 0 10px currentColor}
+  .floor-row.led-hijau .led{background:#2ecc71;color:#2ecc71}
+  .floor-row.led-kuning .led{background:#f1c40f;color:#f1c40f}
+  .floor-row.led-merah .led{background:#e74c3c;color:#e74c3c}
+  .floor-label .pct{font-size:.6rem;color:#6c8da8;font-weight:700}
 
-  /* slot grid + jalur */
-  .slot-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;position:relative}
-  .slot{aspect-ratio:1.1;border-radius:6px;position:relative;transition:all .18s ease;cursor:pointer}
-  .slot.kosong{background:#0f2938;border:1px dashed #255070;box-shadow:inset 0 0 10px #00000060}
-  .slot.kosong:hover{border-color:#2d9cdb;background:#12364a;transform:scale(1.08)}
-  .slot.terisi{background:linear-gradient(145deg,#2d9cdb,#1a6b9e);border:1px solid #7ac4f0;box-shadow:0 0 10px #2d9cdb88,inset 0 -3px 6px #00000060;overflow:hidden}
-  .slot.terisi .vehicle-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.8rem;animation:pop .35s ease}
-  @keyframes pop{0%{transform:scale(0) rotate(-30deg);opacity:0}70%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
+  /* area slot + jalan */
+  .floor-area{flex:1;position:relative;min-height:76px;background:repeating-linear-gradient(90deg,transparent 0 58px,#0f2536 58px 60px)}
+  .lane{position:absolute;bottom:0;left:0;right:0;height:18px;background:linear-gradient(180deg,#0a1a24,#071320);border-top:1px dashed #2d9cdb44}
+  .lane::after{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:repeating-linear-gradient(90deg,#f1c40f 0 10px,transparent 10px 22px);opacity:.4;transform:translateY(-50%)}
 
-  /* === PINTU MASUK + JALUR === */
-  .floor-lane{position:absolute;bottom:0;left:0;right:0;height:22px;background:linear-gradient(90deg,#0a1a24,#123043,#0a1a24);border-top:1px dashed #2d9cdb44;pointer-events:none;z-index:1}
-  .floor-lane::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:repeating-linear-gradient(90deg,#f1c40f 0 8px,transparent 8px 16px);opacity:.35;transform:translateY(-50%)}
-  .gate{position:absolute;bottom:22px;left:6px;font-size:.9rem;z-index:3;opacity:.7}
-  .gate-label{position:absolute;bottom:44px;left:6px;font-size:.55rem;color:#2d9cdb;letter-spacing:1px;font-weight:700;z-index:3}
+  .slots{position:absolute;top:4px;left:4px;right:4px;bottom:18px;display:grid;grid-template-columns:repeat(20,1fr);gap:3px}
+  .slot{position:relative;border-radius:4px;transition:background .2s}
+  .slot.kosong{background:#0f2938;border:1px dashed #255070}
+  .slot.terisi{background:linear-gradient(145deg,#2d9cdb,#1a6b9e);border:1px solid #7ac4f0;box-shadow:0 0 8px #2d9cdb66}
+  .slot .veh{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.85rem;animation:pop .3s ease}
+  @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
 
-  /* kendaraan bergerak */
-  .moving-vehicle{position:absolute;font-size:1.05rem;z-index:5;pointer-events:none;transition:all linear;filter:drop-shadow(0 0 6px #2d9cdb88)}
-  .moving-vehicle.exit{filter:drop-shadow(0 0 6px #e74c3c88)}
+  /* === KENDARAAN BERGERAK === */
+  .vehicle{position:absolute;font-size:1.15rem;z-index:20;pointer-events:none;transition:all linear;filter:drop-shadow(0 2px 6px #00000099)}
+  .vehicle.car{font-size:1.25rem}
+  .vehicle.motor{font-size:1rem}
 
-  .panel{background:linear-gradient(160deg,rgba(14,36,54,.95),rgba(5,16,26,.95));border-radius:28px;padding:22px 24px;border:1px solid #1c3d56;box-shadow:0 20px 40px -20px #000}
-  .panel h3{color:#fff;font-size:1rem;letter-spacing:.8px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-  .selector-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-  .selector-row label{color:#8ab0cf;font-size:.85rem;width:76px}
-  select{flex:1;background:#0a1f2e;border:1px solid #23506e;color:#fff;padding:11px 16px;border-radius:40px;font-size:.9rem;font-weight:600;cursor:pointer;outline:none;transition:.2s}
-  select:focus{border-color:#2d9cdb;box-shadow:0 0 0 3px #2d9cdb33}
-  .btn-group{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-  .btn{border:none;border-radius:50px;padding:14px 16px;font-weight:700;font-size:.92rem;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.4px}
-  .btn:active{transform:scale(.95)}
-  .btn-primary{background:linear-gradient(135deg,#2d9cdb,#1f6e9e);color:#fff;box-shadow:0 8px 22px -6px #2d9cdb99}
-  .btn-primary:hover{background:linear-gradient(135deg,#3fb0ef,#2d9cdb);box-shadow:0 10px 28px -4px #2d9cdbcc}
-  .btn-outline{background:transparent;border:1px solid #2d9cdb;color:#a8d4ff}
-  .btn-outline:hover{background:#12364a}
-  .btn-danger{background:linear-gradient(135deg,#c0392b,#8e2a1f);color:#ffd5cf;box-shadow:0 8px 20px -8px #c0392b99}
-  .btn-danger:hover{background:linear-gradient(135deg,#e74c3c,#c0392b)}
+  /* === RAMP antar lantai === */
+  .ramp{position:absolute;right:80px;width:24px;height:8px;background:linear-gradient(180deg,#1f6e9e,#0a1a24);z-index:2;border-radius:2px}
+  .ramp::after{content:'▸';position:absolute;right:-6px;top:-5px;color:#2d9cdb;font-size:.7rem}
 
-  .auto-section{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid #1c3d56}
-  .toggle-label{display:flex;align-items:center;gap:10px;color:#c4d9ec;font-size:.88rem;font-weight:600}
-  .switch{position:relative;width:50px;height:26px;background:#0a1f2e;border-radius:40px;border:1px solid #23506e;cursor:pointer;transition:.25s;flex-shrink:0}
-  .switch.active{background:#1f6e46;border-color:#2ecc71;box-shadow:0 0 16px #2ecc7155}
-  .switch::after{content:'';position:absolute;width:20px;height:20px;background:#7fa4c4;border-radius:50%;top:2px;left:2px;transition:.25s}
-  .switch.active::after{left:26px;background:#d4ffe6}
-  .auto-status{font-size:.75rem;font-weight:700;padding:4px 14px;border-radius:30px;background:#0a1f2e;color:#6c8da8;border:1px solid #1c3d56;transition:.25s}
-  .auto-status.on{background:#123d26;color:#7ff0a8;border-color:#2ecc71;box-shadow:0 0 14px #2ecc7155}
+  /* gerbang bawah */
+  .gate-bottom{position:absolute;bottom:-2px;left:18px;font-size:1rem;z-index:5;opacity:.8}
+  .gate-label{position:absolute;bottom:22px;left:12px;font-size:.55rem;color:#2d9cdb;letter-spacing:1.5px;font-weight:800;z-index:5;background:#0a1a24;padding:2px 6px;border-radius:3px;border:1px solid #1a3a52}
 
-  .legend{display:flex;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid #1c3d56;flex-wrap:wrap}
-  .legend-item{display:flex;align-items:center;gap:6px;font-size:.72rem;color:#8ab0cf}
-  .dot{width:10px;height:10px;border-radius:3px}
-  .dot.green{background:#2ecc71;box-shadow:0 0 8px #2ecc71}
-  .dot.yellow{background:#f1c40f;box-shadow:0 0 8px #f1c40f}
-  .dot.red{background:#e74c3c;box-shadow:0 0 8px #e74c3c}
+  /* ===== BOTTOM CONTROL BAR (seperti game) ===== */
+  .controls{position:sticky;bottom:0;z-index:100;display:flex;justify-content:center;align-items:center;gap:12px;padding:12px 18px;background:linear-gradient(0deg,rgba(5,20,32,.98),rgba(5,20,32,.8));backdrop-filter:blur(10px);border-top:1px solid #1a3a52;flex-wrap:wrap;margin-top:10px}
+  .ctrl-btn{background:#0e2a3f;border:1px solid #23506e;color:#e0f0ff;border-radius:50px;padding:11px 20px;font-weight:700;font-size:.85rem;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:8px;box-shadow:0 6px 16px -6px #000}
+  .ctrl-btn:hover{background:#143b56;border-color:#2d9cdb;transform:translateY(-2px)}
+  .ctrl-btn:active{transform:scale(.95)}
+  .ctrl-btn.primary{background:linear-gradient(135deg,#2d9cdb,#1f6e9e);border-color:#6ab8f0;box-shadow:0 8px 22px -6px #2d9cdb99}
+  .ctrl-btn.primary:hover{background:linear-gradient(135deg,#3fb0ef,#2d9cdb)}
+  .ctrl-btn.danger{background:linear-gradient(135deg,#c0392b,#8e2a1f);border-color:#e74c3c;color:#ffd5cf}
 
-  .footer-note{margin-top:18px;text-align:center;font-size:.72rem;color:#3b627b;letter-spacing:.3px}
+  .ctrl-select{background:#0a1f2e;border:1px solid #23506e;color:#fff;padding:11px 16px;border-radius:50px;font-size:.85rem;font-weight:700;cursor:pointer;outline:none}
+  .ctrl-select:focus{border-color:#2d9cdb}
 
-  .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:#0e2536;border:1px solid #2d9cdb;color:#dbeaf6;padding:12px 24px;border-radius:40px;font-size:.88rem;font-weight:600;box-shadow:0 12px 30px -6px #000,0 0 20px #2d9cdb44;opacity:0;transition:.35s cubic-bezier(.4,0,.2,1);z-index:9999;pointer-events:none;max-width:90vw;text-align:center}
+  .auto-pill{display:flex;align-items:center;gap:8px;background:#0a1f2e;border:1px solid #23506e;border-radius:50px;padding:6px 8px 6px 16px;font-size:.8rem;font-weight:700;color:#8ab0cf}
+  .switch{position:relative;width:44px;height:24px;background:#0a1f2e;border-radius:40px;border:1px solid #23506e;cursor:pointer;transition:.25s;flex-shrink:0}
+  .switch.active{background:#1f6e46;border-color:#2ecc71}
+  .switch::after{content:'';position:absolute;width:18px;height:18px;background:#7fa4c4;border-radius:50%;top:2px;left:2px;transition:.25s}
+  .switch.active::after{left:22px;background:#d4ffe6}
+
+  .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(80px);background:#0e2536;border:1px solid #2d9cdb;color:#dbeaf6;padding:11px 22px;border-radius:40px;font-size:.85rem;font-weight:700;box-shadow:0 12px 30px -6px #000,0 0 20px #2d9cdb44;opacity:0;transition:.35s;z-index:9999;pointer-events:none;max-width:90vw;text-align:center}
   .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-  .toast.error{border-color:#e74c3c;box-shadow:0 12px 30px -6px #000,0 0 20px #e74c3c44}
-  .toast.success{border-color:#2ecc71;box-shadow:0 12px 30px -6px #000,0 0 20px #2ecc7144}
+  .toast.error{border-color:#e74c3c}
+  .toast.success{border-color:#2ecc71}
 
   @media(max-width:900px){
-    .main-grid{grid-template-columns:1fr}
-    .stats-grid{grid-template-columns:repeat(2,1fr)}
-    h1{font-size:1.4rem}
-    .slot-grid{grid-template-columns:repeat(10,1fr);gap:4px}
-    .app{padding:18px}
+    .floor-label{flex:0 0 56px}
+    .floor-label .num{font-size:.75rem}
+    .slot .veh{font-size:.65rem}
+    .vehicle{font-size:.95rem}
+    .hud-chip{min-width:60px;padding:5px 10px}
+    .hud-chip .val{font-size:.95rem}
+    .ramp{right:50px}
   }
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="header">
-    <div>
-      <h1>SMART PARKING UPI <span>LIVE</span></h1>
-      <div class="subhead">Simulasi Interaktif · Motor & Mobil bergerak masuk–parkir · Real-time</div>
-    </div>
-    <button class="btn btn-danger" id="resetAllBtn" style="padding:11px 24px">⟲ Reset Semua</button>
+
+<!-- HUD ATAS seperti game -->
+<div class="hud">
+  <div class="hud-left">
+    <div class="logo">🚗 SMART PARKING UPI <span>SIMULATOR</span></div>
   </div>
-
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-label">Total Slot</div><div class="stat-value" id="totalCapacity">60</div><div class="stat-sub">3 lantai × 20</div></div>
-    <div class="stat-card"><div class="stat-label">Terisi</div><div class="stat-value" id="totalOccupied">0</div><div class="stat-sub">kendaraan</div></div>
-    <div class="stat-card"><div class="stat-label">Tersedia</div><div class="stat-value" id="totalAvailable">60</div><div class="stat-sub">slot kosong</div></div>
-    <div class="stat-card"><div class="stat-label">Keterisian</div><div class="stat-value" id="totalPercent">0<span class="stat-unit">%</span></div><div class="global-progress"><div class="progress-fill" id="globalProgressFill"></div></div></div>
+  <div class="hud-stats">
+    <div class="hud-chip"><span class="lbl">Total</span><span class="val blue" id="hudTotal">60</span></div>
+    <div class="hud-chip"><span class="lbl">Terisi</span><span class="val orange" id="hudOccupied">0</span></div>
+    <div class="hud-chip"><span class="lbl">Kosong</span><span class="val green" id="hudAvailable">60</span></div>
+    <div class="hud-chip"><span class="lbl">Isi</span><span class="val blue" id="hudPercent">0%</span></div>
   </div>
+</div>
 
-  <div class="main-grid">
-    <div class="building-wrap">
-      <div class="building-roof"></div>
-      <div id="floorsContainer"></div>
-      <div class="legend">
-        <div class="legend-item"><span class="dot green"></span> 0–70% Tersedia</div>
-        <div class="legend-item"><span class="dot yellow"></span> 71–90% Hampir Penuh</div>
-        <div class="legend-item"><span class="dot red"></span> 91–100% Penuh</div>
-        <div class="legend-item">🚗 Mobil &nbsp; 🏍️ Motor</div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h3>🎮 Kontrol Simulasi</h3>
-      <div class="selector-row">
-        <label>Lantai</label>
-        <select id="floorSelector">
-          <option value="0">Lantai 1</option>
-          <option value="1">Lantai 2</option>
-          <option value="2">Lantai 3</option>
-        </select>
-      </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" id="enterBtn">⬆ Masuk</button>
-        <button class="btn btn-outline" id="exitBtn">⬇ Keluar</button>
-      </div>
-      <div class="auto-section">
-        <div class="toggle-label"><span>Simulasi Otomatis</span><div class="switch" id="autoSwitch"></div></div>
-        <span class="auto-status" id="autoStatus">OFF</span>
-      </div>
-      <div style="font-size:.75rem;color:#5c7d98;margin-top:14px;text-align:center;line-height:1.6">
-        💡 <b>Klik slot kosong</b> untuk parkir langsung<br>
-        💡 <b>Klik slot terisi</b> untuk mengeluarkan kendaraan<br>
-        🏍️ 30% kemungkinan motor, 70% mobil<br>
-        ⌨️ <b>Enter</b> masuk · <b>Backspace</b> keluar · <b>R</b> reset
-      </div>
-    </div>
+<!-- SCENE gedung -->
+<div class="scene-wrap">
+  <div class="building" id="building">
+    <!-- lantai di-generate JS -->
+    <div class="gate-bottom">🚧</div>
+    <div class="gate-label">GERBANG</div>
   </div>
+</div>
 
-  <div class="footer-note">*Simulasi edukasi. Kapasitas per lantai 20 kendaraan. Indikator LED otomatis.</div>
+<!-- KONTROL BAWAH seperti game -->
+<div class="controls">
+  <select class="ctrl-select" id="floorSelector">
+    <option value="0">Lantai 1</option>
+    <option value="1">Lantai 2</option>
+    <option value="2">Lantai 3</option>
+  </select>
+  <button class="ctrl-btn primary" id="enterBtn">⬆ Kendaraan Masuk</button>
+  <button class="ctrl-btn" id="exitBtn">⬇ Kendaraan Keluar</button>
+  <div class="auto-pill">
+    <span>Auto</span>
+    <div class="switch" id="autoSwitch"></div>
+  </div>
+  <button class="ctrl-btn danger" id="resetAllBtn">⟲ Reset</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -178,395 +149,340 @@
 <script>
 (function(){
   const CAP = 20, FLOORS = 3;
-  // setiap slot punya tipe kendaraan: null | 'car' | 'motor'
-  let slots = [
-    Array(CAP).fill(null),
-    Array(CAP).fill(null),
-    Array(CAP).fill(null)
-  ];
+  let slots = [Array(CAP).fill(null), Array(CAP).fill(null), Array(CAP).fill(null)];
   let autoInterval = null, autoActive = false;
 
   const $ = id => document.getElementById(id);
-  const floorsContainer = $('floorsContainer');
-  const totalOccupiedEl = $('totalOccupied');
-  const totalAvailableEl = $('totalAvailable');
-  const totalPercentEl = $('totalPercent');
-  const globalProgressFill = $('globalProgressFill');
+  const buildingEl = $('building');
+  const hudTotal = $('hudTotal');
+  const hudOccupied = $('hudOccupied');
+  const hudAvailable = $('hudAvailable');
+  const hudPercent = $('hudPercent');
   const floorSelector = $('floorSelector');
   const enterBtn = $('enterBtn');
   const exitBtn = $('exitBtn');
   const autoSwitch = $('autoSwitch');
-  const autoStatus = $('autoStatus');
   const resetAllBtn = $('resetAllBtn');
   const toastEl = $('toast');
 
   let toastTimer;
   function showToast(msg, type='info') {
     toastEl.textContent = msg;
-    toastEl.className = 'toast show ' + (type === 'error' ? 'error' : type === 'success' ? 'success' : '');
+    toastEl.className = 'toast show ' + (type==='error'?'error':type==='success'?'success':'');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+    toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 2000);
   }
-
-  function vibrate(ms=40) { if (navigator.vibrate) navigator.vibrate(ms); }
+  function vibrate(ms=30){ if(navigator.vibrate) navigator.vibrate(ms); }
 
   let audioCtx;
   function beep(freq=660, dur=0.08, type='sine') {
     try {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type;
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(); osc.stop(audioCtx.currentTime + dur);
-    } catch(e) {}
+      if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      if (audioCtx.state==='suspended') audioCtx.resume();
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type=type; o.frequency.value=freq;
+      g.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime+dur);
+    } catch(e){}
   }
 
-  function countOccupied(floorIdx) {
-    return slots[floorIdx].filter(v => v !== null).length;
-  }
+  const countOccupied = fi => slots[fi].filter(v=>v!==null).length;
+  const totalOccupied = () => slots.reduce((s,f)=>s+f.filter(v=>v!==null).length,0);
+  const findEmpty = fi => slots[fi].indexOf(null);
 
-  function totalOccupied() {
-    return slots.reduce((sum, f) => sum + f.filter(v => v !== null).length, 0);
-  }
-
-  // cari slot kosong pertama (indeks) di lantai, atau -1
-  function findEmptySlot(floorIdx) {
-    return slots[floorIdx].indexOf(null);
-  }
-
+  // ===== RENDER =====
   function render() {
     const total = totalOccupied();
-    const totalCap = CAP * FLOORS;
-    const avail = totalCap - total;
-    const pct = Math.round((total/totalCap)*100);
+    const cap = CAP*FLOORS;
+    const avail = cap-total;
+    const pct = Math.round(total/cap*100);
+    hudTotal.textContent = cap;
+    hudOccupied.textContent = total;
+    hudAvailable.textContent = avail;
+    hudPercent.textContent = pct+'%';
 
-    totalOccupiedEl.textContent = total;
-    totalAvailableEl.textContent = avail;
-    totalPercentEl.innerHTML = pct + '<span class="stat-unit">%</span>';
-    globalProgressFill.style.width = pct + '%';
-    totalOccupiedEl.classList.add('bump');
-    setTimeout(()=>totalOccupiedEl.classList.remove('bump'), 220);
+    // hapus semua floor-row lama, sisipkan ulang sebelum gate
+    buildingEl.querySelectorAll('.floor-row').forEach(e=>e.remove());
 
     let html = '';
-    for (let i=0; i<FLOORS; i++) {
+    for (let i=FLOORS-1; i>=0; i--) {
       const occ = countOccupied(i);
-      const percent = Math.round((occ/CAP)*100);
-      let ledClass, ledText;
-      if (percent <= 70) { ledClass='led-hijau'; ledText='TERSEDIA'; }
-      else if (percent <= 90) { ledClass='led-kuning'; ledText='HAMPIR PENUH'; }
-      else { ledClass='led-merah'; ledText='PENUH'; }
+      const percent = Math.round(occ/CAP*100);
+      let led='led-hijau';
+      if (percent>90) led='led-merah';
+      else if (percent>70) led='led-kuning';
 
-      let slotHtml = '';
-      for (let s=0; s<CAP; s++) {
+      let slotHtml='';
+      for (let s=0;s<CAP;s++){
         const v = slots[i][s];
-        const filled = v !== null;
-        const icon = filled ? (v === 'motor' ? '🏍️' : '🚗') : '';
-        slotHtml += `<div class="slot ${filled?'terisi':'kosong'}" data-floor="${i}" data-slot="${s}" data-filled="${filled}" title="${filled?'Klik untuk keluar':'Klik untuk parkir'}">
-          ${filled ? `<span class="vehicle-icon">${icon}</span>` : ''}
-        </div>`;
+        const filled = v!==null;
+        const icon = filled ? (v==='motor'?'🏍️':'🚗') : '';
+        slotHtml += `<div class="slot ${filled?'terisi':'kosong'}" data-floor="${i}" data-slot="${s}" data-filled="${filled}">${filled?`<span class="veh">${icon}</span>`:''}</div>`;
       }
 
       html += `
-        <div class="floor-card ${ledClass}" data-floor="${i}" id="floor-${i}">
-          <div class="floor-header">
-            <div class="floor-name">🏢 LANTAI ${i+1}</div>
-            <div class="floor-status">${ledText}</div>
-            <div class="floor-count">${occ}/${CAP} (${percent}%)</div>
+        <div class="floor-row ${led}" data-floor="${i}" id="floor-${i}">
+          <div class="floor-label">
+            <div class="led"></div>
+            <div class="num">L${i+1}</div>
+            <div class="pct">${percent}%</div>
           </div>
-          <div style="position:relative;">
-            <div class="slot-grid" id="slotgrid-${i}">${slotHtml}</div>
-            <div class="floor-lane"></div>
-            <div class="gate">🚧</div>
-            <div class="gate-label">PINTU</div>
+          <div class="floor-area">
+            <div class="slots" id="slots-${i}">${slotHtml}</div>
+            <div class="lane"></div>
+            ${i<FLOORS-1?'<div class="ramp" style="bottom:8px"></div>':''}
           </div>
         </div>`;
     }
-    floorsContainer.innerHTML = html;
+    // sisipkan di paling awal building
+    const gate = buildingEl.querySelector('.gate-bottom');
+    gate.insertAdjacentHTML('beforebegin', html);
 
-    floorsContainer.querySelectorAll('.slot').forEach(slot => {
-      slot.addEventListener('click', () => handleSlotClick(slot));
+    // attach click slot
+    buildingEl.querySelectorAll('.slot').forEach(slot=>{
+      slot.addEventListener('click', ()=>handleSlotClick(slot));
     });
   }
 
-  // === ANIMASI KENDARAAN MASUK (per lantai) ===
-  function animateVehicleEnter(floorIdx, slotIdx, vehicleType) {
-    const floorCard = document.getElementById(`floor-${floorIdx}`);
-    if (!floorCard) { finishEnter(floorIdx, slotIdx, vehicleType); return; }
-    const slotGrid = document.getElementById(`slotgrid-${floorIdx}`);
-    if (!slotGrid) { finishEnter(floorIdx, slotIdx, vehicleType); return; }
+  // ===== ANIMASI KENDARAAN NAIK DARI GERBANG BAWAH KE LANTAI =====
+  function animateEnter(floorIdx, slotIdx, vt) {
+    const floorRow = document.getElementById(`floor-${floorIdx}`);
+    const slotsEl = document.getElementById(`slots-${floorIdx}`);
+    if (!floorRow || !slotsEl) { commitEnter(floorIdx, slotIdx, vt); return; }
+    const targetSlot = slotsEl.querySelector(`.slot[data-slot="${slotIdx}"]`);
+    if (!targetSlot) { commitEnter(floorIdx, slotIdx, vt); return; }
 
-    const floorRect = floorCard.getBoundingClientRect();
-    const gridRect = slotGrid.getBoundingClientRect();
-    const targetSlotEl = slotGrid.querySelector(`.slot[data-slot="${slotIdx}"]`);
-    if (!targetSlotEl) { finishEnter(floorIdx, slotIdx, vehicleType); return; }
-    const slotRect = targetSlotEl.getBoundingClientRect();
+    const bRect = buildingEl.getBoundingClientRect();
+    const fRect = floorRow.getBoundingClientRect();
+    const sRect = targetSlot.getBoundingClientRect();
 
-    const icon = vehicleType === 'motor' ? '🏍️' : '🚗';
+    const icon = vt==='motor'?'🏍️':'🚗';
     const veh = document.createElement('div');
-    veh.className = 'moving-vehicle';
+    veh.className = 'vehicle ' + vt;
     veh.textContent = icon;
-    // posisi awal: di pintu (kiri bawah area grid)
-    const startX = gridRect.left - floorRect.left - 20;
-    const startY = gridRect.bottom - floorRect.top - 4;
+    // posisi awal: gerbang bawah gedung
+    const startX = bRect.left + 30 - bRect.left; // relatif ke gedung
+    const startY = bRect.bottom - 40 - bRect.top;
     veh.style.left = startX + 'px';
     veh.style.top = startY + 'px';
-    floorCard.appendChild(veh);
+    veh.style.opacity = '0';
+    buildingEl.appendChild(veh);
 
-    // target akhir: tengah slot
-    const endX = slotRect.left - floorRect.left + slotRect.width/2 - 8;
-    const endY = slotRect.top - floorRect.top + slotRect.height/2 - 8;
+    const targetX = sRect.left - bRect.left + sRect.width/2 - 8;
+    const targetY = sRect.top - bRect.top + sRect.height/2 - 8;
 
-    // step 1: masuk ke jalur (naik ke lane), lalu ke slot
-    requestAnimationFrame(() => {
-      // gerak horizontal dulu ke kolom target di lane
-      veh.style.transition = 'left 0.5s ease-in-out, top 0.2s ease-out';
-      veh.style.left = (slotRect.left - floorRect.left + slotRect.width/2 - 8) + 'px';
-      veh.style.top = startY + 'px';
+    // jalur: dari gerbang (kiri bawah) -> naik ke ketinggian lantai -> horizontal ke slot
+    const laneY = fRect.bottom - bRect.top - 12;
+
+    // step 0: muncul
+    requestAnimationFrame(()=>{
+      veh.style.opacity='1';
+      veh.style.transition='left 0.6s ease-in-out, top 0.5s ease-in-out';
+      veh.style.left = (bRect.left + 40 - bRect.left) + 'px';
+      veh.style.top = laneY + 'px';
+      beep(500, 0.06, 'triangle');
     });
 
-    setTimeout(() => {
-      // step 2: naik ke slot
-      veh.style.transition = 'top 0.45s cubic-bezier(.4,0,.2,1), left 0.15s ease';
-      veh.style.top = endY + 'px';
-      beep(vehicleType === 'motor' ? 900 : 780, 0.1);
-    }, 520);
+    // step 1: horizontal ke kolom slot
+    setTimeout(()=>{
+      veh.style.transition='left 0.7s ease-in-out';
+      veh.style.left = targetX + 'px';
+    }, 620);
 
-    // step 3: selesai -> update state, render
-    setTimeout(() => {
+    // step 2: masuk ke slot
+    setTimeout(()=>{
+      veh.style.transition='top 0.4s ease-out';
+      veh.style.top = targetY + 'px';
+      beep(780, 0.08);
+    }, 1350);
+
+    // step 3: selesai
+    setTimeout(()=>{
       veh.remove();
-      finishEnter(floorIdx, slotIdx, vehicleType);
-    }, 1050);
-
-    beep(550, 0.06, 'triangle');
+      commitEnter(floorIdx, slotIdx, vt);
+    }, 1800);
   }
 
-  function finishEnter(floorIdx, slotIdx, vehicleType) {
-    // double check slot masih kosong
-    if (slots[floorIdx][slotIdx] === null) {
-      slots[floorIdx][slotIdx] = vehicleType;
-    }
+  function commitEnter(floorIdx, slotIdx, vt) {
+    if (slots[floorIdx][slotIdx]===null) slots[floorIdx][slotIdx]=vt;
     render();
-    vibrate(30);
+    vibrate(25);
   }
 
-  // === ANIMASI KENDARAAN KELUAR ===
-  function animateVehicleExit(floorIdx, slotIdx, vehicleType) {
-    const floorCard = document.getElementById(`floor-${floorIdx}`);
-    const slotGrid = document.getElementById(`slotgrid-${floorIdx}`);
-    if (!floorCard || !slotGrid) {
-      finishExit(floorIdx, slotIdx);
-      return;
-    }
-    const targetSlotEl = slotGrid.querySelector(`.slot[data-slot="${slotIdx}"]`);
-    if (!targetSlotEl) { finishExit(floorIdx, slotIdx); return; }
+  // ===== ANIMASI KELUAR =====
+  function animateExit(floorIdx, slotIdx, vt) {
+    const floorRow = document.getElementById(`floor-${floorIdx}`);
+    const slotsEl = document.getElementById(`slots-${floorIdx}`);
+    if (!floorRow || !slotsEl) { commitExit(floorIdx, slotIdx); return; }
+    const targetSlot = slotsEl.querySelector(`.slot[data-slot="${slotIdx}"]`);
+    if (!targetSlot) { commitExit(floorIdx, slotIdx); return; }
 
-    const floorRect = floorCard.getBoundingClientRect();
-    const slotRect = targetSlotEl.getBoundingClientRect();
-    const gridRect = slotGrid.getBoundingClientRect();
+    const bRect = buildingEl.getBoundingClientRect();
+    const fRect = floorRow.getBoundingClientRect();
+    const sRect = targetSlot.getBoundingClientRect();
 
-    const icon = vehicleType === 'motor' ? '🏍️' : '🚗';
+    const icon = vt==='motor'?'🏍️':'🚗';
     const veh = document.createElement('div');
-    veh.className = 'moving-vehicle exit';
+    veh.className='vehicle ' + vt;
     veh.textContent = icon;
-    veh.style.left = (slotRect.left - floorRect.left + slotRect.width/2 - 8) + 'px';
-    veh.style.top = (slotRect.top - floorRect.top + slotRect.height/2 - 8) + 'px';
-    veh.style.transition = 'none';
-    floorCard.appendChild(veh);
+    veh.style.left = (sRect.left-bRect.left+sRect.width/2-8)+'px';
+    veh.style.top = (sRect.top-bRect.top+sRect.height/2-8)+'px';
+    veh.style.transition='none';
+    buildingEl.appendChild(veh);
 
-    // sembunyikan slot dulu (kosongkan) supaya icon tidak dobel
-    finishExit(floorIdx, slotIdx, true); // render tanpa animasi icon
+    // kosongkan dulu di state biar icon slot hilang
+    commitExit(floorIdx, slotIdx, true);
 
-    requestAnimationFrame(() => {
-      // step 1: turun ke lane
-      veh.style.transition = 'top 0.3s ease-out';
-      veh.style.top = (gridRect.bottom - floorRect.top - 4) + 'px';
+    const laneY = fRect.bottom - bRect.top - 12;
+    const exitX = bRect.left + 20 - bRect.left;
+
+    // step 1: turun ke lane
+    requestAnimationFrame(()=>{
+      veh.style.transition='top 0.35s ease-out';
+      veh.style.top = laneY + 'px';
+      beep(450,0.08,'triangle');
     });
 
-    setTimeout(() => {
-      // step 2: keluar ke kiri (pintu)
-      veh.style.transition = 'left 0.55s ease-in-out, opacity 0.3s ease';
-      veh.style.left = '-30px';
-      veh.style.opacity = '0.3';
-      beep(450, 0.1, 'triangle');
-    }, 320);
+    // step 2: keluar ke gerbang kiri bawah (turun terus ke bawah gedung)
+    setTimeout(()=>{
+      veh.style.transition='left 0.6s ease-in-out, top 0.5s ease-in-out, opacity 0.3s';
+      veh.style.left = exitX + 'px';
+      veh.style.top = (bRect.height - 30) + 'px';
+      veh.style.opacity='0.2';
+    }, 380);
 
-    setTimeout(() => {
-      veh.remove();
-    }, 900);
-
-    vibrate(30);
+    setTimeout(()=>veh.remove(), 1100);
+    vibrate(25);
   }
 
-  function finishExit(floorIdx, slotIdx, silent=false) {
+  function commitExit(floorIdx, slotIdx, silent=false) {
     slots[floorIdx][slotIdx] = null;
     render();
-    if (!silent) beep(480, 0.08, 'triangle');
+    if (!silent) beep(480,0.08,'triangle');
   }
 
-  // === HANDLE KLIK SLOT ===
+  // ===== CLICK SLOT =====
   function handleSlotClick(slot) {
-    const floorIdx = parseInt(slot.dataset.floor, 10);
-    const slotIdx = parseInt(slot.dataset.slot, 10);
-    const isFilled = slots[floorIdx][slotIdx] !== null;
-
-    if (isFilled) {
-      const vt = slots[floorIdx][slotIdx];
-      showToast(`⬇️ ${vt==='motor'?'Motor':'Mobil'} keluar dari Lantai ${floorIdx+1}`, 'success');
-      animateVehicleExit(floorIdx, slotIdx, vt);
+    const fi = parseInt(slot.dataset.floor,10);
+    const si = parseInt(slot.dataset.slot,10);
+    const filled = slots[fi][si]!==null;
+    if (filled) {
+      const vt = slots[fi][si];
+      showToast(`⬇️ ${vt==='motor'?'Motor':'Mobil'} keluar Lantai ${fi+1}`,'success');
+      animateExit(fi, si, vt);
     } else {
-      if (countOccupied(floorIdx) >= CAP) {
-        showToast(`❌ Lantai ${floorIdx+1} sudah penuh!`, 'error');
-        beep(220,0.15,'sawtooth');
-        return;
-      }
-      // tentukan tipe kendaraan secara acak: 30% motor, 70% mobil
-      const vt = Math.random() < 0.3 ? 'motor' : 'car';
-      showToast(`✅ ${vt==='motor'?'Motor':'Mobil'} parkir di Lantai ${floorIdx+1}`, 'success');
-      animateVehicleEnter(floorIdx, slotIdx, vt);
+      const vt = Math.random()<0.3?'motor':'car';
+      showToast(`⬆️ ${vt==='motor'?'Motor':'Mobil'} masuk Lantai ${fi+1}`,'success');
+      animateEnter(fi, si, vt);
     }
   }
 
-  // === TOMBOL MASUK (pilih slot kosong pertama) ===
-  function addVehicleAuto(floorIdx) {
-    if (floorIdx < 0 || floorIdx >= FLOORS) return false;
-    const emptyIdx = findEmptySlot(floorIdx);
-    if (emptyIdx === -1) return false;
-    const vt = Math.random() < 0.3 ? 'motor' : 'car';
-    showToast(`⬆️ ${vt==='motor'?'Motor':'Mobil'} masuk Lantai ${floorIdx+1}`, 'success');
-    animateVehicleEnter(floorIdx, emptyIdx, vt);
+  // ===== TOMBOL MASUK =====
+  function addVehicleAuto(fi) {
+    if (fi<0||fi>=FLOORS) return false;
+    const empty = findEmpty(fi);
+    if (empty===-1) return false;
+    const vt = Math.random()<0.3?'motor':'car';
+    showToast(`⬆️ ${vt==='motor'?'Motor':'Mobil'} masuk Lantai ${fi+1}`,'success');
+    animateEnter(fi, empty, vt);
     return true;
   }
 
-  // === TOMBOL KELUAR (keluarkan kendaraan terakhir/terisi pertama) ===
-  function removeVehicle(floorIdx) {
-    if (floorIdx < 0 || floorIdx >= FLOORS) return false;
-    // cari slot terisi (dari indeks terbesar biar seperti keluar terakhir)
-    let idx = -1;
-    for (let s = CAP - 1; s >= 0; s--) {
-      if (slots[floorIdx][s] !== null) { idx = s; break; }
-    }
-    if (idx === -1) return false;
-    const vt = slots[floorIdx][idx];
-    showToast(`⬇️ ${vt==='motor'?'Motor':'Mobil'} keluar Lantai ${floorIdx+1}`, 'success');
-    animateVehicleExit(floorIdx, idx, vt);
+  function removeVehicle(fi) {
+    if (fi<0||fi>=FLOORS) return false;
+    let idx=-1;
+    for (let s=CAP-1;s>=0;s--){ if(slots[fi][s]!==null){idx=s;break;} }
+    if (idx===-1) return false;
+    const vt = slots[fi][idx];
+    showToast(`⬇️ ${vt==='motor'?'Motor':'Mobil'} keluar Lantai ${fi+1}`,'success');
+    animateExit(fi, idx, vt);
     return true;
   }
 
   function resetAll() {
-    slots = [Array(CAP).fill(null), Array(CAP).fill(null), Array(CAP).fill(null)];
+    slots = [Array(CAP).fill(null),Array(CAP).fill(null),Array(CAP).fill(null)];
     if (autoActive) stopAuto();
     render();
-    beep(500, 0.15, 'sine');
-    showToast('⟲ Semua data direset', 'info');
+    beep(500,0.15,'sine');
+    showToast('⟲ Semua data direset','info');
   }
 
-  // === AUTO ===
+  // ===== AUTO =====
   function startAuto() {
     if (autoInterval) clearInterval(autoInterval);
     autoActive = true;
     autoSwitch.classList.add('active');
-    autoStatus.textContent = 'ON';
-    autoStatus.classList.add('on');
-    showToast('▶️ Simulasi otomatis aktif', 'info');
-    autoInterval = setInterval(() => {
-      const floorIdx = Math.floor(Math.random()*FLOORS);
-      const doEnter = Math.random() < 0.6;
+    showToast('▶ Simulasi otomatis aktif','info');
+    autoInterval = setInterval(()=>{
+      const fi = Math.floor(Math.random()*FLOORS);
+      const doEnter = Math.random()<0.6;
       if (doEnter) {
-        // cari lantai yang punya slot kosong
-        let target = -1;
-        for (let i=0; i<FLOORS; i++) {
-          const idx = (floorIdx + i) % FLOORS;
-          if (findEmptySlot(idx) !== -1) { target = idx; break; }
-        }
-        if (target !== -1) {
-          const emptyIdx = findEmptySlot(target);
-          const vt = Math.random() < 0.3 ? 'motor' : 'car';
-          animateVehicleEnter(target, emptyIdx, vt);
+        let target=-1;
+        for (let i=0;i<FLOORS;i++){ const idx=(fi+i)%FLOORS; if(findEmpty(idx)!==-1){target=idx;break;} }
+        if (target!==-1) {
+          const empty = findEmpty(target);
+          const vt = Math.random()<0.3?'motor':'car';
+          animateEnter(target, empty, vt);
         } else {
-          // semua penuh, keluarkan
-          for (let i=0; i<FLOORS; i++) {
-            const idx = (floorIdx + i) % FLOORS;
-            let found = -1;
-            for (let s=CAP-1;s>=0;s--){ if(slots[idx][s]!==null){found=s;break;} }
-            if (found !== -1) { animateVehicleExit(idx, found, slots[idx][found]); break; }
+          for (let i=0;i<FLOORS;i++){
+            const idx=(fi+i)%FLOORS;
+            let found=-1; for(let s=CAP-1;s>=0;s--){if(slots[idx][s]!==null){found=s;break;}}
+            if (found!==-1){ animateExit(idx,found,slots[idx][found]); break; }
           }
         }
       } else {
-        let done = false;
-        for (let i=0; i<FLOORS; i++) {
-          const idx = (floorIdx + i) % FLOORS;
-          let found = -1;
-          for (let s=CAP-1;s>=0;s--){ if(slots[idx][s]!==null){found=s;break;} }
-          if (found !== -1) {
-            const vt = slots[idx][found];
-            animateVehicleExit(idx, found, vt);
-            done = true;
-            break;
-          }
+        let done=false;
+        for (let i=0;i<FLOORS;i++){
+          const idx=(fi+i)%FLOORS;
+          let found=-1; for(let s=CAP-1;s>=0;s--){if(slots[idx][s]!==null){found=s;break;}}
+          if (found!==-1){ animateExit(idx,found,slots[idx][found]); done=true; break; }
         }
         if (!done) {
-          // semua kosong, tambahkan
-          for (let i=0; i<FLOORS; i++) {
-            const idx = (floorIdx + i) % FLOORS;
-            if (findEmptySlot(idx) !== -1) {
-              const emptyIdx = findEmptySlot(idx);
-              const vt = Math.random() < 0.3 ? 'motor' : 'car';
-              animateVehicleEnter(idx, emptyIdx, vt);
-              break;
-            }
+          for (let i=0;i<FLOORS;i++){
+            const idx=(fi+i)%FLOORS;
+            if (findEmpty(idx)!==-1){ animateEnter(idx, findEmpty(idx), Math.random()<0.3?'motor':'car'); break; }
           }
         }
       }
-    }, 2200);
+    }, 2400);
   }
-
   function stopAuto() {
-    if (autoInterval) { clearInterval(autoInterval); autoInterval = null; }
-    autoActive = false;
+    if (autoInterval){clearInterval(autoInterval);autoInterval=null;}
+    autoActive=false;
     autoSwitch.classList.remove('active');
-    autoStatus.textContent = 'OFF';
-    autoStatus.classList.remove('on');
-    showToast('⏸️ Simulasi otomatis berhenti', 'info');
+    showToast('⏸ Simulasi otomatis berhenti','info');
   }
+  function toggleAuto(){ autoActive?stopAuto():startAuto(); }
 
-  function toggleAuto() {
-    autoActive ? stopAuto() : startAuto();
-  }
-
+  // ===== INIT =====
   function init() {
     render();
-    enterBtn.addEventListener('click', () => {
-      const idx = parseInt(floorSelector.value, 10);
-      if (!addVehicleAuto(idx)) {
-        showToast(`❌ Lantai ${idx+1} penuh!`, 'error');
+    enterBtn.addEventListener('click', ()=>{
+      const fi = parseInt(floorSelector.value,10);
+      if (!addVehicleAuto(fi)) {
+        showToast(`❌ Lantai ${fi+1} penuh!`,'error');
         beep(200,0.15,'sawtooth');
-        vibrate([40,30,40]);
       }
     });
-    exitBtn.addEventListener('click', () => {
-      const idx = parseInt(floorSelector.value, 10);
-      if (!removeVehicle(idx)) {
-        showToast(`❌ Lantai ${idx+1} sudah kosong!`, 'error');
+    exitBtn.addEventListener('click', ()=>{
+      const fi = parseInt(floorSelector.value,10);
+      if (!removeVehicle(fi)) {
+        showToast(`❌ Lantai ${fi+1} kosong!`,'error');
         beep(200,0.15,'sawtooth');
-        vibrate([40,30,40]);
       }
     });
     resetAllBtn.addEventListener('click', resetAll);
     autoSwitch.addEventListener('click', toggleAuto);
 
-    document.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'SELECT') return;
-      if (e.key === 'Enter') { e.preventDefault(); enterBtn.click(); }
-      if (e.key === 'Backspace') { e.preventDefault(); exitBtn.click(); }
-      if (e.key === 'r' || e.key === 'R') { resetAllBtn.click(); }
+    document.addEventListener('keydown', e=>{
+      if (e.target.tagName==='SELECT') return;
+      if (e.key==='Enter'){e.preventDefault();enterBtn.click();}
+      if (e.key==='Backspace'){e.preventDefault();exitBtn.click();}
+      if (e.key==='r'||e.key==='R') resetAllBtn.click();
     });
-
-    window.addEventListener('beforeunload', () => { if (autoInterval) clearInterval(autoInterval); });
+    window.addEventListener('beforeunload', ()=>{ if(autoInterval) clearInterval(autoInterval); });
   }
 
   init();
