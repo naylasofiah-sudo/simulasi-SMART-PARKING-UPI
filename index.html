@@ -30,35 +30,29 @@
   .building::before{content:'UPI SMART PARKING (MONITORING)';position:absolute;top:-26px;left:50%;transform:translateX(-50%);font-size:.7rem;letter-spacing:5px;color:#2d9cdb;font-weight:800;text-shadow:0 0 20px #2d9cdb88;white-space:nowrap}
   .building::after{content:'';position:absolute;bottom:-6px;left:-6px;right:-6px;height:8px;background:linear-gradient(90deg,#0f2a3f,#1f6e9e,#0f2a3f);border-radius:0 0 10px 10px;box-shadow:0 6px 20px #1f6e9e66}
 
-  .floor-row{position:relative;display:flex;align-items:stretch;margin-bottom:8px;border-radius:8px;background:#0d1f2e;border:1px solid #1a3a52;overflow:hidden;transition:box-shadow .3s}
+  .floor-row{position:relative;display:flex;align-items:stretch;margin-bottom:6px;border-radius:8px;background:#0d1f2e;border:1px solid #1a3a52;overflow:hidden;transition:box-shadow .3s}
   .floor-row.led-hijau{box-shadow:inset 4px 0 0 #2ecc71,0 0 24px #2ecc7133}
   .floor-row.led-kuning{box-shadow:inset 4px 0 0 #f1c40f,0 0 24px #f1c40f33}
   .floor-row.led-merah{box-shadow:inset 4px 0 0 #e74c3c,0 0 24px #e74c3c33}
 
-  .floor-label{flex:0 0 78px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;background:linear-gradient(90deg,#08141f,#0d1f2e);border-right:1px solid #1a3a52;gap:3px;z-index:3}
-  .floor-label .num{font-size:.95rem;font-weight:800;letter-spacing:.5px}
-  .floor-label .led{width:9px;height:9px;border-radius:50%;background:#2ecc71;box-shadow:0 0 10px currentColor}
+  .floor-label{flex:0 0 65px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;background:linear-gradient(90deg,#08141f,#0d1f2e);border-right:1px solid #1a3a52;gap:2px;z-index:3}
+  .floor-label .num{font-size:.85rem;font-weight:800;letter-spacing:.5px}
+  .floor-label .led{width:8px;height:8px;border-radius:50%;background:#2ecc71;box-shadow:0 0 10px currentColor}
   .floor-row.led-hijau .led{background:#2ecc71;color:#2ecc71}
   .floor-row.led-kuning .led{background:#f1c40f;color:#f1c40f}
   .floor-row.led-merah .led{background:#e74c3c;color:#e74c3c}
-  .floor-label .pct{font-size:.6rem;color:#6c8da8;font-weight:700}
+  .floor-label .pct{font-size:.55rem;color:#6c8da8;font-weight:700}
 
-  .floor-area{flex:1;position:relative;min-height:76px;background:repeating-linear-gradient(90deg,transparent 0 58px,#0f2536 58px 60px)}
-  .lane{position:absolute;bottom:0;left:0;right:0;height:18px;background:linear-gradient(180deg,#0a1a24,#071320);border-top:1px dashed #2d9cdb44}
-  .lane::after{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:repeating-linear-gradient(90deg,#f1c40f 0 10px,transparent 10px 22px);opacity:.4;transform:translateY(-50%)}
-  .slots{position:absolute;top:4px;left:4px;right:4px;bottom:18px;display:grid;grid-template-columns:repeat(20,1fr);gap:3px}
-  .slot{position:relative;border-radius:4px;transition:background .2s}
+  .floor-area{flex:1;position:relative;min-height:44px;background:repeating-linear-gradient(90deg,transparent 0 32px,#0f2536 32px 34px)}
+  
+  /* Grid 30 slot: 15 kolom x 2 baris */
+  .slots{position:absolute;top:4px;left:4px;right:4px;bottom:4px;display:grid;grid-template-columns:repeat(15,1fr);grid-template-rows:repeat(2,1fr);gap:2px}
+  .slot{position:relative;border-radius:3px;transition:background .2s}
   .slot.kosong{background:#0f2938;border:1px dashed #255070}
-  .slot.terisi{background:linear-gradient(145deg,#2d9cdb,#1a6b9e);border:1px solid #7ac4f0;box-shadow:0 0 8px #2d9cdb66}
-  .slot .veh{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.85rem;animation:pop .3s ease}
+  .slot.terisi{background:linear-gradient(145deg,#2d9cdb,#1a6b9e);border:1px solid #7ac4f0;box-shadow:0 0 6px #2d9cdb66}
+  .slot .veh{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.6rem;animation:pop .3s ease}
   @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
   
-  .vehicle{position:absolute;font-size:1.15rem;z-index:20;pointer-events:none;transition:all linear;filter:drop-shadow(0 2px 6px #00000099)}
-  .vehicle.car{font-size:1.25rem}
-  .vehicle.motor{font-size:1rem}
-  
-  .ramp{position:absolute;right:80px;width:24px;height:8px;background:linear-gradient(180deg,#1f6e9e,#0a1a24);z-index:2;border-radius:2px}
-  .ramp::after{content:'▸';position:absolute;right:-6px;top:-5px;color:#2d9cdb;font-size:.7rem}
   .gate-bottom{position:absolute;bottom:-2px;left:18px;font-size:1rem;z-index:5;opacity:.8}
   .gate-label{position:absolute;bottom:22px;left:12px;font-size:.55rem;color:#2d9cdb;letter-spacing:1.5px;font-weight:800;z-index:5;background:#0a1a24;padding:2px 6px;border-radius:3px;border:1px solid #1a3a52}
 
@@ -102,8 +96,8 @@
   .log-out{color:#f1c40f;font-weight:700}
 
   /* SYSTEM STATUS */
-  .sys-status{display:flex;flex-direction:column;gap:8px;}
-  .sys-item{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#08141f;border-radius:6px;font-size:.8rem}
+  .sys-status{display:flex;flex-direction:column;gap:6px;}
+  .sys-item{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;background:#08141f;border-radius:6px;font-size:.75rem}
   .sys-item .k{color:#8ab0cf;font-weight:600}
   .sys-item .v{font-weight:800}
   .v-green{color:#2ecc71}
@@ -119,13 +113,10 @@
   @media(max-width:1000px){.grid-3{grid-template-columns:1fr 1fr}}
   @media(max-width:760px){
     .grid-2,.grid-3{grid-template-columns:1fr}
-    .floor-label{flex:0 0 56px}
-    .floor-label .num{font-size:.75rem}
-    .slot .veh{font-size:.65rem}
-    .vehicle{font-size:.95rem}
+    .floor-label{flex:0 0 55px}
+    .slot .veh{font-size:.5rem}
     .hud-chip{min-width:60px;padding:4px 8px}
     .hud-chip .val{font-size:.9rem}
-    .ramp{right:50px}
   }
 </style>
 </head>
@@ -134,12 +125,12 @@
 <div class="app">
   <!-- HUD -->
   <div class="hud">
-    <div class="logo">🚗 SMART PARKING UPI <span>v4.0 · DASHBOARD PETUGAS</span></div>
+    <div class="logo">🏍️ SMART PARKING UPI <span>v4.1 · DASHBOARD PETUGAS</span></div>
     <div class="hud-stats">
       <div class="hud-chip"><span class="lbl">Jam Simulasi</span><span class="val purple" id="hudTime">06:00</span></div>
-      <div class="hud-chip"><span class="lbl">Total Slot</span><span class="val blue" id="hudTotal">60</span></div>
+      <div class="hud-chip"><span class="lbl">Total Slot</span><span class="val blue" id="hudTotal">180</span></div>
       <div class="hud-chip"><span class="lbl">Terisi</span><span class="val orange" id="hudOccupied">0</span></div>
-      <div class="hud-chip"><span class="lbl">Kosong</span><span class="val green" id="hudAvailable">60</span></div>
+      <div class="hud-chip"><span class="lbl">Kosong</span><span class="val green" id="hudAvailable">180</span></div>
       <div class="hud-chip"><span class="lbl">Keterisian</span><span class="val blue" id="hudPercent">0%</span></div>
     </div>
   </div>
@@ -177,9 +168,9 @@
       <h3>📡 Status Sistem</h3>
       <div class="sys-status">
         <div class="sys-item"><span class="k">Status Monitoring</span><span class="v v-green" id="sysMonStatus">Sistem Aktif</span></div>
-        <div class="sys-item"><span class="k">Lantai Penuh</span><span class="v v-red" id="sysFullFloors">0 / 3</span></div>
+        <div class="sys-item"><span class="k">Lantai Penuh</span><span class="v v-red" id="sysFullFloors">0 / 6</span></div>
         <div class="sys-item"><span class="k">Pembaruan Terakhir</span><span class="v v-blue" id="sysLastUpdate">-</span></div>
-        <div class="sys-item"><span class="k">Total Kapasitas</span><span class="v v-blue">60 Slot (3 Lantai)</span></div>
+        <div class="sys-item"><span class="k">Total Kapasitas</span><span class="v v-blue">180 Motor (6 Lantai)</span></div>
       </div>
       <div style="font-size:.7rem;color:#6c8da8;margin-top:12px;line-height:1.4">
         *Simulasi virtual. Tidak terhubung ke sensor fisik atau RFID.
@@ -188,7 +179,7 @@
 
     <div class="panel">
       <h3>📊 Kapasitas per Lantai</h3>
-      <div class="sys-status" id="floorStatusList">
+      <div class="sys-status" id="floorStatusList" style="max-height:180px; overflow-y:auto; padding-right:4px;">
         <!-- Diisi via JS -->
       </div>
     </div>
@@ -223,10 +214,10 @@
 <script>
 (function(){
   'use strict';
-  console.log('🚀 Dashboard Monitoring Petugas UPI berjalan...');
+  console.log('🚀 Dashboard Monitoring Petugas UPI (6 Lantai) berjalan...');
 
-  // KONFIGURASI SESUAI INSTRUKSI: 3 Lantai, Kapasitas 20
-  const CAP = 20, FLOORS = 3;
+  // KONFIGURASI: 6 Lantai, Kapasitas 30 Motor
+  const CAP = 30, FLOORS = 6;
   const TICK_MS_BASE = 800; 
 
   let slots = Array.from({length: FLOORS}, () => Array(CAP).fill(null));
@@ -256,8 +247,7 @@
   function countOccupied(fi) { return slots[fi].filter(v=>v!==null).length; }
   function totalOccupied() { return slots.reduce((s,f)=>s+f.filter(v=>v!==null).length,0); }
   
-  // Logika Rekomendasi: Prioritaskan Lantai Bawah (Sesuai permintaan terakhirmu)
-  // Walaupun petugas tidak memilih manual, sistem mengarahkan kendaraan masuk ke lantai bawah dulu.
+  // Logika Rekomendasi: Prioritaskan Lantai Bawah (L1 -> L6)
   function getTargetFloor() {
     for (let f=0; f<FLOORS; f++) {
       if (countOccupied(f) < CAP) return f;
@@ -284,7 +274,7 @@
     let buildingHtml = '';
     let fullFloorsCount = 0;
 
-    // Render dari Lantai Atas ke Bawah
+    // Render dari Lantai 6 (atas) ke Lantai 1 (bawah)
     for (let i = FLOORS-1; i >= 0; i--) {
       const occ = countOccupied(i);
       const percent = Math.round(occ/CAP*100);
@@ -299,7 +289,7 @@
       for (let s=0; s<CAP; s++) {
         const v = slots[i][s];
         const filled = v !== null;
-        const icon = filled ? (v === 'motor' ? '🏍️' : '🚗') : '';
+        const icon = filled ? '🏍️' : '';
         slotHtml += `<div class="slot ${filled ? 'terisi' : 'kosong'}">${filled ? `<span class="veh">${icon}</span>` : ''}</div>`;
       }
 
@@ -312,8 +302,6 @@
           </div>
           <div class="floor-area">
             <div class="slots">${slotHtml}</div>
-            <div class="lane"></div>
-            ${i < FLOORS-1 ? '<div class="ramp" style="bottom:8px"></div>' : ''}
           </div>
         </div>`;
     }
@@ -343,14 +331,13 @@
   }
 
   // --- LOGIKA RIWAYAT AKTIVITAS ---
-  function addLog(type, kendaraan, lantai, totalSaatIni) {
-    // Hapus pesan "Belum ada aktivitas"
+  function addLog(type, lantai, totalSaatIni) {
     if (logBody.querySelector('td[colspan="5"]')) logBody.innerHTML = '';
 
     const tr = document.createElement('tr');
     const typeStr = type === 'in' ? 'Masuk' : 'Keluar';
     const typeClass = type === 'in' ? 'log-in' : 'log-out';
-    const icon = kendaraan === 'motor' ? '🏍️ Motor' : '🚗 Mobil';
+    const icon = '🏍️ Motor'; // Selalu motor sesuai permintaan
 
     tr.innerHTML = `
       <td>${formatMin(simMinute)}</td>
@@ -361,11 +348,10 @@
     `;
     
     logBody.appendChild(tr);
-    // Auto scroll ke bawah
     const container = logBody.closest('.table-container');
     container.scrollTop = container.scrollHeight;
     
-    // Batasi riwayat maksimal 50 baris agar tidak berat
+    // Batasi riwayat maksimal 50 baris
     if (logBody.children.length > 50) {
       logBody.removeChild(logBody.firstChild);
     }
@@ -376,52 +362,46 @@
   function tryEnter() {
     const targetFloor = getTargetFloor();
     if (targetFloor === -1) {
-      // Semua penuh
-      showToast('❌ Semua lantai penuh! Kendaraan tidak bisa masuk.', 'error');
+      showToast('❌ Semua lantai penuh! Motor tidak bisa masuk.', 'error');
       return false;
     }
 
     const slotIdx = slots[targetFloor].indexOf(null);
-    const isMotor = Math.random() < 0.5; // Acak mobil/motor
-    const vt = isMotor ? 'motor' : 'car';
-    
-    // Simpan state
-    slots[targetFloor][slotIdx] = vt;
+    // Selalu motor
+    slots[targetFloor][slotIdx] = 'motor';
     totalIn++;
     
-    // Update UI
     const totalSaatIni = totalOccupied();
-    addLog('in', vt, targetFloor + 1, totalSaatIni);
+    addLog('in', targetFloor + 1, totalSaatIni);
     render();
-    showToast(`✅ ${isMotor ? 'Motor' : 'Mobil'} masuk ke Lantai ${targetFloor + 1}`, 'success');
+    showToast(`✅ Motor masuk ke Lantai ${targetFloor + 1}`, 'success');
     return true;
   }
 
   function tryExit() {
-    // Cari lantai dengan kendaraan (prioritas lantai bawah jika ada)
+    // Cari lantai dengan kendaraan (prioritas bawah)
     let targetFloor = -1;
     for (let f=0; f<FLOORS; f++) {
       if (countOccupied(f) > 0) { targetFloor = f; break; }
     }
     if (targetFloor === -1) {
-      showToast('❌ Parkiran kosong, tidak ada kendaraan keluar.', 'error');
+      showToast('❌ Parkiran kosong, tidak ada motor keluar.', 'error');
       return false;
     }
 
-    // Cari slot terisi terakhir (terkanan)
+    // Cari slot terisi terakhir
     let slotIdx = -1;
     for (let s=CAP-1; s>=0; s--) {
       if (slots[targetFloor][s] !== null) { slotIdx = s; break; }
     }
 
-    const vt = slots[targetFloor][slotIdx];
     slots[targetFloor][slotIdx] = null;
     totalOut++;
 
     const totalSaatIni = totalOccupied();
-    addLog('out', vt, targetFloor + 1, totalSaatIni);
+    addLog('out', targetFloor + 1, totalSaatIni);
     render();
-    showToast(`⬇️ ${vt === 'motor' ? 'Motor' : 'Mobil'} keluar dari Lantai ${targetFloor + 1}`, 'success');
+    showToast(`⬇️ Motor keluar dari Lantai ${targetFloor + 1}`, 'success');
     return true;
   }
 
@@ -429,11 +409,8 @@
   function tick() {
     if (!running || paused) return;
 
-    // Maju 1 menit simulasi
     simMinute = (simMinute + 1) % 1440;
 
-    // Probabilitas masuk/keluar sederhana berdasarkan fase waktu
-    // Pagi (06-12) lebih banyak masuk, Siang/Sore (12-18) lebih banyak keluar
     const hour = Math.floor(simMinute / 60);
     let enterProb = 0.2;
     let exitProb = 0.1;
@@ -441,11 +418,9 @@
     if (hour >= 6 && hour < 12) { enterProb = 0.4; exitProb = 0.05; }
     else if (hour >= 12 && hour < 18) { enterProb = 0.1; exitProb = 0.4; }
     
-    // Evaluasi Event
     if (Math.random() < enterProb) tryEnter();
     if (Math.random() < exitProb) tryExit();
 
-    // Selalu render jam agar terlihat berjalan
     render();
   }
 
@@ -485,7 +460,6 @@
     slots = Array.from({length: FLOORS}, () => Array(CAP).fill(null));
     simMinute = 6 * 60; totalIn = 0; totalOut = 0;
     
-    // Reset UI Log
     logBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#6c8da8;padding:12px">Belum ada aktivitas.</td></tr>';
     logCount.textContent = '0 entri';
     $('simStatusBadge').textContent = 'IDLE';
@@ -510,7 +484,7 @@
     }
   });
 
-  // --- INIT ---
+  // Init
   render();
   console.log('✅ Inisialisasi Dashboard Selesai.');
 })();
